@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Squad 65</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="topbar" aria-label="Главная панель">
+        <div>
+          <p class="kicker">Squad 65</p>
+          <h1>Собери отряд из 4 игроков</h1>
+        </div>
+        <div class="stats">
+          <div class="wallet">
+            <span>Монеты</span>
+            <strong id="coins">0</strong>
+          </div>
+          <div class="rank-card">
+            <span>Ранг</span>
+            <strong id="rankName">Новичок I</strong>
+            <small id="rankProgress">0 / 20 RP</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="rank-strip" aria-label="Система рангов">
+        <div class="rank-info">
+          <strong id="currentRank">Новичок I</strong>
+          <span id="nextRank">Следующий ранг: Новичок II</span>
+        </div>
+        <div class="rank-meter">
+          <span id="rankFill"></span>
+        </div>
+      </section>
+
+      <section class="hero">
+        <div class="pitch" aria-label="Отряд">
+          <div class="slot" data-slot="0"></div>
+          <div class="slot" data-slot="1"></div>
+          <div class="slot" data-slot="2"></div>
+          <div class="slot" data-slot="3"></div>
+        </div>
+        <aside class="squad-panel">
+          <div>
+            <p class="label">Сила отряда</p>
+            <strong id="squadPower">0</strong>
+          </div>
+          <button id="autoSquad" type="button">Лучший состав</button>
+          <button id="resetGame" type="button" class="ghost">Новая игра</button>
+        </aside>
+      </section>
+
+      <section class="match section" id="matchPanel">
+        <div class="section-head">
+          <h2>Матч</h2>
+          <p id="matchHint">Выбери турнир, потом принимай решения в ключевых моментах игры.</p>
+        </div>
+        <div class="scoreboard">
+          <div>
+            <span>Турнир</span>
+            <strong id="matchTournament">Нет матча</strong>
+          </div>
+          <div>
+            <span>Счёт</span>
+            <strong id="matchScore">0 : 0</strong>
+          </div>
+          <div>
+            <span>Минута</span>
+            <strong id="matchMinute">0'</strong>
+          </div>
+          <div>
+            <span>Энергия</span>
+            <strong id="matchEnergy">100</strong>
+          </div>
+        </div>
+        <div class="moment">
+          <strong id="momentTitle">Матч ещё не начался</strong>
+          <p id="momentText">Собери полный отряд и нажми “Начать матч” в турнирах.</p>
+        </div>
+        <div id="decisionButtons" class="decision-grid"></div>
+      </section>
+
+      <section class="layout">
+        <div class="section">
+          <div class="section-head">
+            <h2>Ящики</h2>
+            <p>Чем дороже ящик, тем выше шанс сильного персонажа.</p>
+          </div>
+          <div id="boxes" class="box-grid"></div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <h2>Турниры</h2>
+            <p>Нужен полный отряд из 4 персонажей. Победы дают монеты и RP.</p>
+          </div>
+          <div id="tournaments" class="tournament-list"></div>
+        </div>
+      </section>
+
+      <section class="layout lower">
+        <div class="section">
+          <div class="section-head">
+            <h2>Коллекция</h2>
+            <p>Нажми на персонажа, чтобы добавить его в отряд.</p>
+          </div>
+          <div id="collection" class="collection"></div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <h2>Журнал</h2>
+            <p>Последние события игры.</p>
+          </div>
+          <ol id="log" class="log"></ol>
+        </div>
+      </section>
+    </main>
+
+    <template id="playerTemplate">
+      <button class="player-card" type="button">
+        <span class="rating"></span>
+        <span class="name"></span>
+        <span class="rarity"></span>
+      </button>
+    </template>
+
+    <script src="game.js"></script>
+  </body>
+</html>
