@@ -224,6 +224,7 @@ function saveGame() {
     trophies: state.trophies,
     log: state.log,
     lastDailyBonusDate: state.lastDailyBonusDate,
+    lastOpenedPlayerId: state.lastOpenedPlayer?.id || null,
   };
   localStorage.setItem(saveKey, JSON.stringify(data));
 }
@@ -243,6 +244,7 @@ function loadGame() {
     state.trophies = data.trophies && typeof data.trophies === "object" ? data.trophies : {};
     state.log = Array.isArray(data.log) ? data.log.slice(0, 9) : [];
     state.lastDailyBonusDate = data.lastDailyBonusDate || null;
+    state.lastOpenedPlayer = state.players.find((player) => player.id === data.lastOpenedPlayerId) || null;
     addLog("Сохранённый прогресс загружен.");
     if (state.lastDailyBonusDate === todayKey()) {
       addLog("Ежедневный бонус уже получен сегодня.");
@@ -477,13 +479,19 @@ function resetGame() {
   startCleanGame({ clearStorage: true });
 }
 
+function positionIcon(position) {
+  return { ВР: "🧤", ЗЩ: "🛡️", ПЗ: "🎯", НП: "⚡" }[position] || "●";
+}
+
 function playerCard(player) {
   const node = playerTemplate.content.firstElementChild.cloneNode(true);
   node.classList.add(ratingClass(player.rating));
+  node.dataset.position = player.position;
   node.querySelector(".rating").textContent = player.rating;
   node.querySelector(".name").textContent = player.name;
-  node.querySelector(".position").textContent = `Позиция: ${player.position}`;
-  node.querySelector(".rarity").textContent = `${rarityName(player.rating)} · ${player.source}`;
+  node.querySelector(".position").textContent = `${positionIcon(player.position)} ${player.position}`;
+  node.querySelector(".rarity").textContent = rarityName(player.rating);
+  node.querySelector(".source").textContent = player.source;
   node.addEventListener("click", () => selectPlayer(player.id));
   if (state.squad.includes(player.id)) {
     node.classList.add("in-squad");
@@ -508,12 +516,12 @@ function renderBoxes() {
   boxesEl.replaceChildren();
   boxes.forEach((box) => {
     const article = document.createElement("article");
-    article.className = "box-card";
+    article.className = `box-card ${box.id}`;
     article.innerHTML = `
       <strong>${box.name}</strong>
       <p>${box.note}</p>
-      <span>Рейтинг: ${box.min}-${box.max}</span>
-      <span class="price">Цена: ${box.price} монеты</span>
+      <span>Диапазон рейтинга: ${box.min}-${box.max}</span>
+      <span class="price">🪙 ${box.price} монеты</span>
     `;
     const button = document.createElement("button");
     button.type = "button";
@@ -531,6 +539,11 @@ function renderSquad() {
     const player = state.players.find((item) => item.id === state.squad[index]);
     if (player) {
       slot.append(playerCard(player));
+    } else {
+      const placeholder = document.createElement("span");
+      placeholder.className = "slot-placeholder";
+      placeholder.textContent = positions[index];
+      slot.append(placeholder);
     }
   });
   const basePower = squadPower();
@@ -565,17 +578,26 @@ function renderTournaments() {
     const article = document.createElement("article");
     const isAvailable = hasFullSquad && currentPower >= tournament.required && !state.match;
     const shortage = Math.max(0, tournament.required - currentPower);
-    const availabilityText = isAvailable
-      ? "Турнир доступен"
-      : `Не хватает ${shortage} силы${hasFullSquad ? "" : " · нужен полный отряд"}`;
-    article.className = `tournament ${isAvailable ? "available" : "unavailable"}`;
+    const isCurrentMatch = state.match?.tournament.name === tournament.name;
+    const availabilityText = isCurrentMatch
+      ? "Матч идёт"
+      : isAvailable
+        ? "Доступен"
+        : `Не хватает ${shortage} силы${hasFullSquad ? "" : " · нужен полный отряд"}`;
+    const statusClass = isCurrentMatch ? "live" : isAvailable ? "ok" : "warn";
+    article.className = `tournament ${isCurrentMatch ? "matching" : isAvailable ? "available" : "unavailable"}`;
     article.innerHTML = `
-      <strong>${tournament.name}</strong>
+      <div class="tournament-title">
+        <strong>${tournament.name}</strong>
+        <span class="trophy-mark" aria-label="Трофей">🏆</span>
+      </div>
       <p>Награда: ${tournament.reward} монет и ${tournament.rp} RP. Трофей: ${tournament.trophy}.</p>
       <div class="tournament-hints">
-        <span>Нужно силы: <strong>${tournament.required}</strong></span>
-        <span>Текущая итоговая сила: <strong>${currentPower}</strong></span>
-        <span class="availability ${isAvailable ? "ok" : "warn"}">${availabilityText}</span>
+        <span><small>Нужно силы</small><strong>${tournament.required}</strong></span>
+        <span><small>Моя итоговая сила</small><strong>${currentPower}</strong></span>
+        <span><small>Награда</small><strong>${tournament.reward} 🪙 · ${tournament.rp} RP</strong></span>
+        <span><small>Кубок</small><strong>${tournament.trophy}</strong></span>
+        <span class="availability ${statusClass}">${availabilityText}</span>
       </div>
     `;
     const button = document.createElement("button");
@@ -591,7 +613,7 @@ function renderTournaments() {
 function renderDailyBonus() {
   const claimed = state.lastDailyBonusDate === todayKey();
   dailyBonusEl.disabled = claimed;
-  dailyBonusEl.textContent = claimed ? "Бонус получен сегодня" : "Ежедневный бонус +3";
+  dailyBonusEl.textContent = claimed ? "✅ Бонус получен" : "🎁 Бонус +3";
 }
 
 function renderEconomyHint() {
@@ -612,11 +634,19 @@ function renderLastOpening() {
 
   const rarity = rarityName(player.rating);
   lastOpeningEl.className = `last-opening ${ratingClass(player.rating)}`;
-  lastOpeningEl.innerHTML = `
+  const featuredCard = playerCard(player);
+  featuredCard.tabIndex = -1;
+  const meta = document.createElement("div");
+  meta.className = "last-opening-meta";
+  meta.innerHTML = `
     <span class="last-opening__label">Последнее открытие</span>
     <strong>${player.rating} · ${player.name}</strong>
-    <small>${player.position} · ${rarity} · ${player.source}</small>
+    <small>${positionIcon(player.position)} ${player.position} · ${rarity} · ${player.source}</small>
   `;
+  const wrapper = document.createElement("div");
+  wrapper.className = "last-opening-card";
+  wrapper.append(featuredCard, meta);
+  lastOpeningEl.replaceChildren(wrapper);
 }
 
 function renderTrophies() {
