@@ -23,6 +23,7 @@
             <strong id="rankName">Новичок I</strong>
             <small id="rankProgress">0 / 20 RP</small>
           </div>
+          <button id="dailyBonus" type="button" class="daily-bonus">Ежедневный бонус</button>
         </div>
       </section>
 
@@ -47,6 +48,8 @@
           <div>
             <p class="label">Сила отряда</p>
             <strong id="squadPower">0</strong>
+            <p id="balanceBonus" class="bonus-line">Баланс состава: 0</p>
+            <p id="effectivePower" class="bonus-line">Итоговая сила: 0</p>
           </div>
           <button id="autoSquad" type="button">Лучший состав</button>
           <button id="resetGame" type="button" class="ghost">Новая игра</button>
@@ -89,6 +92,7 @@
             <h2>Ящики</h2>
             <p>Чем дороже ящик, тем выше шанс сильного персонажа.</p>
           </div>
+          <p id="economyHint" class="economy-hint">Сначала собери 4 игроков, потом усиливай состав.</p>
           <div id="boxes" class="box-grid"></div>
         </div>
 
@@ -102,6 +106,14 @@
       </section>
 
       <section class="layout lower">
+        <div class="section trophies-section">
+          <div class="section-head">
+            <h2>Трофеи</h2>
+            <p>Побеждай в турнирах и собирай кубки.</p>
+          </div>
+          <div id="trophies" class="trophy-list"></div>
+        </div>
+
         <div class="section">
           <div class="section-head">
             <h2>Коллекция</h2>
@@ -124,6 +136,7 @@
       <button class="player-card" type="button">
         <span class="rating"></span>
         <span class="name"></span>
+        <span class="position"></span>
         <span class="rarity"></span>
       </button>
     </template>
