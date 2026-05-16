@@ -86,7 +86,7 @@ const state = {
   log: [],
   lastDailyBonusDate: null,
   economyHint: "Сначала собери 4 игроков, потом усиливай состав.",
-  skipNextSave: false,
+  lastOpenedPlayer: null,
   match: null,
 };
 
@@ -114,6 +114,7 @@ const decisionButtonsEl = document.querySelector("#decisionButtons");
 const dailyBonusEl = document.querySelector("#dailyBonus");
 const economyHintEl = document.querySelector("#economyHint");
 const trophiesEl = document.querySelector("#trophies");
+const lastOpeningEl = document.querySelector("#lastOpening");
 const playerTemplate = document.querySelector("#playerTemplate");
 
 document.querySelector("#autoSquad").addEventListener("click", selectBestSquad);
@@ -287,6 +288,7 @@ function openBox(box) {
   state.coins -= box.price;
   const player = createPlayer(box);
   state.players.push(player);
+  state.lastOpenedPlayer = player;
   addLog(`Из "${box.name}" выпал ${player.name} с рейтингом ${player.rating}.`);
 
   const emptySlot = state.squad.findIndex((id) => id === null);
@@ -353,7 +355,10 @@ function selectBestSquad() {
     state.squad.push(null);
   }
 
-  addLog("Выбран лучший доступный состав с учётом баланса.");
+  const selectedPlayers = squadPlayers();
+  const basePower = selectedPlayers.reduce((sum, player) => sum + player.rating, 0);
+  const balance = balanceBonusFor(selectedPlayers);
+  addLog(`Лучший состав выбран: базовая сила ${basePower}, баланс ${balance}, итог ${basePower + balance}.`);
   render();
 }
 
@@ -451,9 +456,10 @@ function closeFinishedMatch() {
   render();
 }
 
-function resetGame() {
-  localStorage.removeItem(saveKey);
-  state.skipNextSave = true;
+function startCleanGame({ clearStorage = true } = {}) {
+  if (clearStorage) {
+    localStorage.clear();
+  }
   state.coins = 12;
   state.rankPoints = 0;
   state.players = [];
@@ -461,9 +467,14 @@ function resetGame() {
   state.trophies = {};
   state.lastDailyBonusDate = null;
   state.economyHint = "Сначала собери 4 игроков, потом усиливай состав.";
+  state.lastOpenedPlayer = null;
   state.match = null;
   state.log = ["Новая игра началась. Открой ящики и собери отряд."];
   render();
+}
+
+function resetGame() {
+  startCleanGame({ clearStorage: true });
 }
 
 function playerCard(player) {
@@ -547,17 +558,30 @@ function renderCollection() {
 
 function renderTournaments() {
   tournamentsEl.replaceChildren();
+  const currentPower = effectiveSquadPower();
+  const hasFullSquad = fullSquad();
+
   tournaments.forEach((tournament) => {
     const article = document.createElement("article");
-    article.className = "tournament";
+    const isAvailable = hasFullSquad && currentPower >= tournament.required && !state.match;
+    const shortage = Math.max(0, tournament.required - currentPower);
+    const availabilityText = isAvailable
+      ? "Турнир доступен"
+      : `Не хватает ${shortage} силы${hasFullSquad ? "" : " · нужен полный отряд"}`;
+    article.className = `tournament ${isAvailable ? "available" : "unavailable"}`;
     article.innerHTML = `
       <strong>${tournament.name}</strong>
-      <p>Нужно силы: ${tournament.required}. Награда: ${tournament.reward} монет и ${tournament.rp} RP. Трофей: ${tournament.trophy}.</p>
+      <p>Награда: ${tournament.reward} монет и ${tournament.rp} RP. Трофей: ${tournament.trophy}.</p>
+      <div class="tournament-hints">
+        <span>Нужно силы: <strong>${tournament.required}</strong></span>
+        <span>Текущая итоговая сила: <strong>${currentPower}</strong></span>
+        <span class="availability ${isAvailable ? "ok" : "warn"}">${availabilityText}</span>
+      </div>
     `;
     const button = document.createElement("button");
     button.type = "button";
-    button.textContent = "Начать матч";
-    button.disabled = !fullSquad() || effectiveSquadPower() < tournament.required || Boolean(state.match);
+    button.textContent = state.match ? "Матч уже идёт" : "Начать матч";
+    button.disabled = !hasFullSquad || currentPower < tournament.required || Boolean(state.match);
     button.addEventListener("click", () => startTournament(tournament));
     article.append(button);
     tournamentsEl.append(article);
@@ -572,6 +596,27 @@ function renderDailyBonus() {
 
 function renderEconomyHint() {
   economyHintEl.textContent = state.players.length < 4 ? state.economyHint : "Отряд собран. Теперь можно охотиться за усилениями.";
+}
+
+function renderLastOpening() {
+  const player = state.lastOpenedPlayer;
+  if (!player) {
+    lastOpeningEl.className = "last-opening";
+    lastOpeningEl.innerHTML = `
+      <span class="last-opening__label">Последнее открытие</span>
+      <strong>Пока нет открытий</strong>
+      <small>Открой ящик, чтобы увидеть нового игрока здесь.</small>
+    `;
+    return;
+  }
+
+  const rarity = rarityName(player.rating);
+  lastOpeningEl.className = `last-opening ${ratingClass(player.rating)}`;
+  lastOpeningEl.innerHTML = `
+    <span class="last-opening__label">Последнее открытие</span>
+    <strong>${player.rating} · ${player.name}</strong>
+    <small>${player.position} · ${rarity} · ${player.source}</small>
+  `;
 }
 
 function renderTrophies() {
@@ -653,21 +698,18 @@ function render() {
   renderDailyBonus();
   renderEconomyHint();
   renderBoxes();
+  renderLastOpening();
   renderSquad();
   renderCollection();
   renderTournaments();
   renderTrophies();
   renderMatch();
   renderLog();
-  if (state.skipNextSave) {
-    state.skipNextSave = false;
-  } else {
-    saveGame();
-  }
+  saveGame();
 }
 
 if (!loadGame()) {
-  resetGame();
+  startCleanGame({ clearStorage: false });
 } else {
   render();
 }
