@@ -93,16 +93,26 @@ h2 {
   display: flex;
   gap: 10px;
   align-items: stretch;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .wallet,
-.rank-card {
+.rank-card,
+.daily-bonus {
   min-width: 132px;
   padding: 12px 16px;
   background: #15191d;
   border: 1px solid var(--line);
   border-radius: 8px;
   text-align: right;
+}
+
+.daily-bonus {
+  min-width: 170px;
+  background: #e1f08d;
+  color: #102015;
+  font-weight: 800;
 }
 
 .rank-card {
@@ -228,6 +238,12 @@ h2 {
   color: var(--green);
 }
 
+.bonus-line {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .squad-panel button,
 .box-card button,
 .tournament button,
@@ -254,7 +270,7 @@ h2 {
 }
 
 .lower {
-  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+  grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.35fr) minmax(280px, 0.65fr);
 }
 
 .section {
@@ -330,6 +346,16 @@ h2 {
   font-size: 12px;
 }
 
+.economy-hint {
+  margin: -4px 0 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(242, 200, 75, 0.35);
+  border-radius: 8px;
+  background: rgba(242, 200, 75, 0.08);
+  color: var(--gold);
+  font-size: 14px;
+}
+
 .box-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -363,9 +389,28 @@ h2 {
   font-weight: 700;
 }
 
-.tournament-list {
+.tournament-list,
+.trophy-list {
   display: grid;
   gap: 12px;
+}
+
+.trophy-item {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid rgba(242, 200, 75, 0.35);
+  border-radius: 8px;
+  background: rgba(242, 200, 75, 0.08);
+}
+
+.trophy-item strong {
+  color: var(--gold);
+}
+
+.trophy-item span {
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .collection {
@@ -400,6 +445,16 @@ h2 {
 }
 
 .name {
+  font-weight: 700;
+}
+
+.position {
+  display: inline-block;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(109, 212, 232, 0.14);
+  color: var(--cyan);
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -461,7 +516,8 @@ button:disabled {
   }
 
   .wallet,
-  .rank-card {
+  .rank-card,
+  .daily-bonus {
     text-align: left;
   }
 

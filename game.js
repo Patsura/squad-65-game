@@ -74,13 +74,19 @@ const moments = [
 
 const firstNames = ["Алекс", "Никита", "Марк", "Даниил", "Леон", "Илья", "Роман", "Тимур", "Матвей", "Кирилл"];
 const lastNames = ["Волков", "Орлов", "Соколов", "Морозов", "Белов", "Громов", "Егоров", "Фомин", "Лукин", "Титов"];
+const positions = ["ВР", "ЗЩ", "ПЗ", "НП"];
+const saveKey = "squad65-save-v1";
 
 const state = {
   coins: 12,
   rankPoints: 0,
   players: [],
   squad: [null, null, null, null],
+  trophies: {},
   log: [],
+  lastDailyBonusDate: null,
+  economyHint: "Сначала собери 4 игроков, потом усиливай состав.",
+  skipNextSave: false,
   match: null,
 };
 
@@ -90,6 +96,8 @@ const collectionEl = document.querySelector("#collection");
 const tournamentsEl = document.querySelector("#tournaments");
 const logEl = document.querySelector("#log");
 const squadPowerEl = document.querySelector("#squadPower");
+const balanceBonusEl = document.querySelector("#balanceBonus");
+const effectivePowerEl = document.querySelector("#effectivePower");
 const rankNameEl = document.querySelector("#rankName");
 const rankProgressEl = document.querySelector("#rankProgress");
 const currentRankEl = document.querySelector("#currentRank");
@@ -103,10 +111,14 @@ const matchHintEl = document.querySelector("#matchHint");
 const momentTitleEl = document.querySelector("#momentTitle");
 const momentTextEl = document.querySelector("#momentText");
 const decisionButtonsEl = document.querySelector("#decisionButtons");
+const dailyBonusEl = document.querySelector("#dailyBonus");
+const economyHintEl = document.querySelector("#economyHint");
+const trophiesEl = document.querySelector("#trophies");
 const playerTemplate = document.querySelector("#playerTemplate");
 
 document.querySelector("#autoSquad").addEventListener("click", selectBestSquad);
 document.querySelector("#resetGame").addEventListener("click", resetGame);
+dailyBonusEl.addEventListener("click", claimDailyBonus);
 
 function ratingClass(rating) {
   if (rating >= 92) return "legend";
@@ -157,15 +169,30 @@ function createPlayer(box) {
     id: makeId(),
     name,
     rating,
+    position: positions[randomInt(0, positions.length - 1)],
     source: box.name,
   };
 }
 
+function squadPlayers() {
+  return state.squad.map((id) => state.players.find((item) => item.id === id)).filter(Boolean);
+}
+
 function squadPower() {
-  return state.squad.reduce((sum, id) => {
-    const player = state.players.find((item) => item.id === id);
-    return sum + (player ? player.rating : 0);
-  }, 0);
+  return squadPlayers().reduce((sum, player) => sum + player.rating, 0);
+}
+
+function balanceBonusFor(players) {
+  const uniquePositions = new Set(players.map((player) => player.position));
+  return uniquePositions.size === 4 ? 10 : 0;
+}
+
+function squadBalanceBonus() {
+  return balanceBonusFor(squadPlayers());
+}
+
+function effectiveSquadPower() {
+  return squadPower() + squadBalanceBonus();
 }
 
 function fullSquad() {
@@ -175,6 +202,68 @@ function fullSquad() {
 function addLog(message) {
   state.log.unshift(message);
   state.log = state.log.slice(0, 9);
+}
+
+function todayKey() {
+  return new Date().toLocaleDateString("sv-SE");
+}
+
+function normalizeSquad(squad) {
+  const ids = Array.isArray(squad) ? squad.slice(0, 4) : [];
+  while (ids.length < 4) ids.push(null);
+  return ids.map((id) => (state.players.some((player) => player.id === id) ? id : null));
+}
+
+function saveGame() {
+  const data = {
+    coins: state.coins,
+    rankPoints: state.rankPoints,
+    players: state.players,
+    squad: state.squad,
+    trophies: state.trophies,
+    log: state.log,
+    lastDailyBonusDate: state.lastDailyBonusDate,
+  };
+  localStorage.setItem(saveKey, JSON.stringify(data));
+}
+
+function loadGame() {
+  const raw = localStorage.getItem(saveKey);
+  if (!raw) return false;
+
+  try {
+    const data = JSON.parse(raw);
+    state.coins = Number.isFinite(data.coins) ? data.coins : 12;
+    state.rankPoints = Number.isFinite(data.rankPoints) ? data.rankPoints : 0;
+    state.players = Array.isArray(data.players)
+      ? data.players.map((player) => ({ ...player, position: player.position || positions[randomInt(0, positions.length - 1)] }))
+      : [];
+    state.squad = normalizeSquad(data.squad);
+    state.trophies = data.trophies && typeof data.trophies === "object" ? data.trophies : {};
+    state.log = Array.isArray(data.log) ? data.log.slice(0, 9) : [];
+    state.lastDailyBonusDate = data.lastDailyBonusDate || null;
+    addLog("Сохранённый прогресс загружен.");
+    if (state.lastDailyBonusDate === todayKey()) {
+      addLog("Ежедневный бонус уже получен сегодня.");
+    }
+    return true;
+  } catch {
+    localStorage.removeItem(saveKey);
+    return false;
+  }
+}
+
+function claimDailyBonus() {
+  if (state.lastDailyBonusDate === todayKey()) {
+    addLog("Ежедневный бонус уже получен сегодня.");
+    render();
+    return;
+  }
+
+  state.coins += 3;
+  state.lastDailyBonusDate = todayKey();
+  addLog("Ежедневный бонус получен: +3 монеты.");
+  render();
 }
 
 function openBox(box) {
@@ -188,6 +277,11 @@ function openBox(box) {
     addLog(`Не хватает монет для "${box.name}".`);
     render();
     return;
+  }
+
+  if (state.players.length < 4 && box.price > boxes[0].price && state.coins - box.price < boxes[0].price) {
+    state.economyHint = "Сначала собери 4 игроков, потом усиливай состав.";
+    addLog(state.economyHint);
   }
 
   state.coins -= box.price;
@@ -236,17 +330,30 @@ function selectBestSquad() {
     return;
   }
 
-  state.squad = state.players
-    .slice()
-    .sort((a, b) => b.rating - a.rating)
-    .slice(0, 4)
-    .map((player) => player.id);
+  let bestPlayers = state.players.slice().sort((a, b) => b.rating - a.rating).slice(0, 4);
+  let bestPower = bestPlayers.reduce((sum, player) => sum + player.rating, 0) + balanceBonusFor(bestPlayers);
 
+  for (let a = 0; a < state.players.length; a += 1) {
+    for (let b = a + 1; b < state.players.length; b += 1) {
+      for (let c = b + 1; c < state.players.length; c += 1) {
+        for (let d = c + 1; d < state.players.length; d += 1) {
+          const candidate = [state.players[a], state.players[b], state.players[c], state.players[d]];
+          const candidatePower = candidate.reduce((sum, player) => sum + player.rating, 0) + balanceBonusFor(candidate);
+          if (candidatePower > bestPower) {
+            bestPlayers = candidate;
+            bestPower = candidatePower;
+          }
+        }
+      }
+    }
+  }
+
+  state.squad = bestPlayers.map((player) => player.id);
   while (state.squad.length < 4) {
     state.squad.push(null);
   }
 
-  addLog("Выбран лучший доступный состав.");
+  addLog("Выбран лучший доступный состав с учётом баланса.");
   render();
 }
 
@@ -259,6 +366,12 @@ function startTournament(tournament) {
 
   if (!fullSquad()) {
     addLog(`Для турнира "${tournament.name}" нужен отряд из 4 персонажей.`);
+    render();
+    return;
+  }
+
+  if (effectiveSquadPower() < tournament.required) {
+    addLog(`Для турнира "${tournament.name}" нужно ${tournament.required} силы с учётом баланса состава.`);
     render();
     return;
   }
@@ -280,7 +393,7 @@ function chooseDecision(option) {
   const match = state.match;
   if (!match || match.finished) return;
 
-  const powerGap = squadPower() - match.tournament.opponent;
+  const powerGap = effectiveSquadPower() - match.tournament.opponent;
   const energyBonus = Math.round((match.energy - 70) / 5);
   const chance = Math.max(16, Math.min(88, 55 + powerGap / 3 + energyBonus - option.risk));
   const success = randomInt(1, 100) <= chance;
@@ -311,7 +424,7 @@ function finishMatch() {
   match.finished = true;
 
   if (match.playerGoals === match.rivalGoals) {
-    const powerRoll = squadPower() + randomInt(-15, 15);
+    const powerRoll = effectiveSquadPower() + randomInt(-15, 15);
     if (powerRoll >= match.tournament.required) {
       match.playerGoals += 1;
       addLog("В дополнительное время отряд дожал соперника.");
@@ -323,6 +436,7 @@ function finishMatch() {
 
   if (match.playerGoals > match.rivalGoals) {
     state.coins += match.tournament.reward;
+    state.trophies[match.tournament.trophy] = (state.trophies[match.tournament.trophy] || 0) + 1;
     addRankPoints(match.tournament.rp);
     addLog(`Победа: ${match.tournament.trophy}! +${match.tournament.reward} монет, +${match.tournament.rp} RP.`);
   } else {
@@ -338,10 +452,15 @@ function closeFinishedMatch() {
 }
 
 function resetGame() {
+  localStorage.removeItem(saveKey);
+  state.skipNextSave = true;
   state.coins = 12;
   state.rankPoints = 0;
   state.players = [];
   state.squad = [null, null, null, null];
+  state.trophies = {};
+  state.lastDailyBonusDate = null;
+  state.economyHint = "Сначала собери 4 игроков, потом усиливай состав.";
   state.match = null;
   state.log = ["Новая игра началась. Открой ящики и собери отряд."];
   render();
@@ -352,6 +471,7 @@ function playerCard(player) {
   node.classList.add(ratingClass(player.rating));
   node.querySelector(".rating").textContent = player.rating;
   node.querySelector(".name").textContent = player.name;
+  node.querySelector(".position").textContent = `Позиция: ${player.position}`;
   node.querySelector(".rarity").textContent = `${rarityName(player.rating)} · ${player.source}`;
   node.addEventListener("click", () => selectPlayer(player.id));
   if (state.squad.includes(player.id)) {
@@ -402,7 +522,11 @@ function renderSquad() {
       slot.append(playerCard(player));
     }
   });
-  squadPowerEl.textContent = squadPower();
+  const basePower = squadPower();
+  const bonus = squadBalanceBonus();
+  squadPowerEl.textContent = basePower;
+  balanceBonusEl.textContent = `Баланс состава: ${bonus > 0 ? "+" : ""}${bonus}`;
+  effectivePowerEl.textContent = `Итоговая сила: ${basePower + bonus}`;
 }
 
 function renderCollection() {
@@ -428,15 +552,44 @@ function renderTournaments() {
     article.className = "tournament";
     article.innerHTML = `
       <strong>${tournament.name}</strong>
-      <p>Нужно силы: ${tournament.required}. Награда: ${tournament.reward} монет и ${tournament.rp} RP.</p>
+      <p>Нужно силы: ${tournament.required}. Награда: ${tournament.reward} монет и ${tournament.rp} RP. Трофей: ${tournament.trophy}.</p>
     `;
     const button = document.createElement("button");
     button.type = "button";
     button.textContent = "Начать матч";
-    button.disabled = !fullSquad() || Boolean(state.match);
+    button.disabled = !fullSquad() || effectiveSquadPower() < tournament.required || Boolean(state.match);
     button.addEventListener("click", () => startTournament(tournament));
     article.append(button);
     tournamentsEl.append(article);
+  });
+}
+
+function renderDailyBonus() {
+  const claimed = state.lastDailyBonusDate === todayKey();
+  dailyBonusEl.disabled = claimed;
+  dailyBonusEl.textContent = claimed ? "Бонус получен сегодня" : "Ежедневный бонус +3";
+}
+
+function renderEconomyHint() {
+  economyHintEl.textContent = state.players.length < 4 ? state.economyHint : "Отряд собран. Теперь можно охотиться за усилениями.";
+}
+
+function renderTrophies() {
+  trophiesEl.replaceChildren();
+  const trophyNames = Object.keys(state.trophies);
+  if (trophyNames.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "Трофеев пока нет. Победи в турнире, чтобы открыть коллекцию кубков.";
+    trophiesEl.append(empty);
+    return;
+  }
+
+  trophyNames.sort().forEach((name) => {
+    const item = document.createElement("div");
+    item.className = "trophy-item";
+    item.innerHTML = `<strong>${name}</strong><span>Побед: ${state.trophies[name]}</span>`;
+    trophiesEl.append(item);
   });
 }
 
@@ -497,12 +650,24 @@ function renderLog() {
 function render() {
   coinEl.textContent = state.coins;
   renderRanks();
+  renderDailyBonus();
+  renderEconomyHint();
   renderBoxes();
   renderSquad();
   renderCollection();
   renderTournaments();
+  renderTrophies();
   renderMatch();
   renderLog();
+  if (state.skipNextSave) {
+    state.skipNextSave = false;
+  } else {
+    saveGame();
+  }
 }
 
-resetGame();
+if (!loadGame()) {
+  resetGame();
+} else {
+  render();
+}
