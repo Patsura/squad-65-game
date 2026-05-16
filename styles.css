@@ -32,6 +32,16 @@ button {
   font: inherit;
   color: inherit;
   cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease, border-color 160ms ease;
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-1px) scale(1.01);
+  filter: brightness(1.05);
+}
+
+button:not(:disabled):active {
+  transform: translateY(0) scale(0.98);
 }
 
 .shell {
@@ -356,6 +366,54 @@ h2 {
   font-size: 14px;
 }
 
+.last-opening {
+  display: grid;
+  gap: 5px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid rgba(109, 212, 232, 0.32);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(109, 212, 232, 0.12), rgba(255, 255, 255, 0.03));
+}
+
+.last-opening__label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.last-opening strong {
+  font-size: 20px;
+}
+
+.last-opening small {
+  color: var(--muted);
+}
+
+.last-opening.common {
+  border-color: rgba(216, 223, 216, 0.42);
+  background: linear-gradient(135deg, rgba(216, 223, 216, 0.14), rgba(255, 255, 255, 0.03));
+}
+
+.last-opening.rare {
+  border-color: rgba(109, 212, 232, 0.62);
+  background: linear-gradient(135deg, rgba(109, 212, 232, 0.22), rgba(255, 255, 255, 0.03));
+}
+
+.last-opening.elite {
+  border-color: rgba(242, 200, 75, 0.72);
+  background: linear-gradient(135deg, rgba(242, 200, 75, 0.25), rgba(255, 255, 255, 0.04));
+}
+
+.last-opening.legend {
+  border-color: rgba(255, 143, 127, 0.82);
+  background:
+    radial-gradient(circle at top right, rgba(255, 143, 127, 0.28), transparent 34%),
+    linear-gradient(135deg, rgba(242, 200, 75, 0.2), rgba(109, 212, 232, 0.08));
+}
+
 .box-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -382,6 +440,47 @@ h2 {
   min-height: 38px;
   margin-bottom: 0;
   color: var(--muted);
+}
+
+.tournament.available {
+  border-color: rgba(120, 214, 114, 0.55);
+}
+
+.tournament.unavailable {
+  border-color: rgba(239, 107, 92, 0.38);
+}
+
+.tournament-hints {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(21, 25, 29, 0.62);
+  font-size: 13px;
+}
+
+.tournament-hints span {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tournament-hints .availability {
+  justify-content: center;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.tournament-hints .ok {
+  background: rgba(120, 214, 114, 0.16);
+  color: var(--green);
+}
+
+.tournament-hints .warn {
+  background: rgba(239, 107, 92, 0.14);
+  color: #ff9b8f;
 }
 
 .price {
@@ -428,10 +527,31 @@ h2 {
   align-content: space-between;
   justify-items: start;
   padding: 12px;
+  overflow: hidden;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: linear-gradient(160deg, #303942, #1d2228);
   text-align: left;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+.player-card::after {
+  content: "";
+  position: absolute;
+  inset: auto -20% -35% 35%;
+  height: 70px;
+  transform: rotate(-12deg);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.player-card span {
+  position: relative;
+  z-index: 1;
+}
+
+.player-card:not(:disabled):hover {
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+  border-color: rgba(255, 255, 255, 0.28);
 }
 
 .player-card.in-squad {
@@ -462,6 +582,33 @@ h2 {
   font-size: 12px;
 }
 
+.player-card.common {
+  border-color: rgba(216, 223, 216, 0.22);
+  background: linear-gradient(160deg, #3a4144, #1d2228);
+}
+
+.player-card.rare {
+  border-color: rgba(109, 212, 232, 0.48);
+  background:
+    radial-gradient(circle at top right, rgba(109, 212, 232, 0.22), transparent 38%),
+    linear-gradient(160deg, #264250, #18222c);
+}
+
+.player-card.elite {
+  border-color: rgba(242, 200, 75, 0.58);
+  background:
+    radial-gradient(circle at top right, rgba(242, 200, 75, 0.28), transparent 40%),
+    linear-gradient(160deg, #4b3d22, #201e18);
+}
+
+.player-card.legend {
+  border-color: rgba(255, 143, 127, 0.72);
+  background:
+    radial-gradient(circle at 80% 10%, rgba(255, 143, 127, 0.36), transparent 34%),
+    radial-gradient(circle at 20% 95%, rgba(109, 212, 232, 0.18), transparent 30%),
+    linear-gradient(160deg, #552d35, #21171f);
+}
+
 .common .rating {
   color: #d8dfd8;
 }
@@ -476,6 +623,7 @@ h2 {
 
 .legend .rating {
   color: #ff8f7f;
+  text-shadow: 0 0 16px rgba(255, 143, 127, 0.45);
 }
 
 .log {
@@ -494,6 +642,7 @@ h2 {
 button:disabled {
   opacity: 0.46;
   cursor: not-allowed;
+  transform: none;
 }
 
 @media (max-width: 820px) {
