@@ -1,14 +1,14 @@
 const boxes = [
-  { id: "bronze", name: "Бронзовый ящик", price: 2, min: 60, max: 70, note: "Надежный стартовый диапазон." },
-  { id: "silver", name: "Серебряный ящик", price: 4, min: 71, max: 82, note: "Хороший шанс усилить основу." },
-  { id: "gold", name: "Золотой ящик", price: 5, min: 80, max: 90, note: "Сильные игроки для турниров." },
-  { id: "icon", name: "Легендарный ящик", price: 6, min: 88, max: 99, note: "Лучший шанс получить звезду." },
+  { id: "bronze", name: "Бронзовый сундук", price: 2, min: 60, max: 70, note: "Кованый сундук для первых героев гарнизона." },
+  { id: "silver", name: "Серебряный ларец", price: 4, min: 71, max: 82, note: "Зачарованный ларец с редкими рекрутами." },
+  { id: "gold", name: "Золотой сундук", price: 5, min: 80, max: 90, note: "Королевская добыча для сильного отряда." },
+  { id: "icon", name: "Легендарный реликварий", price: 6, min: 88, max: 99, note: "Арканный реликварий с шансом на героя эпохи." },
 ];
 
 const tournaments = [
-  { name: "Чемпионат мира", required: 280, reward: 5, rp: 18, trophy: "Кубок мира", opponent: 278 },
-  { name: "Лига чемпионов", required: 300, reward: 7, rp: 24, trophy: "Кубок чемпионов", opponent: 302 },
-  { name: "Кубок континентов", required: 325, reward: 10, rp: 32, trophy: "Кубок континентов", opponent: 326 },
+  { name: "Испытание Короны", required: 280, reward: 5, rp: 18, trophy: "Корона победителя", opponent: 278 },
+  { name: "Лига Архонтов", required: 300, reward: 7, rp: 24, trophy: "Печать архонтов", opponent: 302 },
+  { name: "Знамя похода", required: 325, reward: 10, rp: 32, trophy: "Знамя похода", opponent: 326 },
 ];
 
 const ranks = [
@@ -32,42 +32,42 @@ const ranks = [
 const moments = [
   {
     minute: 18,
-    title: "Первый шанс",
-    text: "Соперник открыл фланг. Как сыграет отряд?",
+    title: "Первый манёвр",
+    text: "Вражеская линия дрогнула. Какой приказ отдаст командир?",
     options: [
-      { label: "Быстрая атака", risk: 14, energy: -14, goalsFor: 1, goalsAgainst: 0, note: "Команда резко ускорилась." },
-      { label: "Контроль мяча", risk: 4, energy: -6, goalsFor: 0, goalsAgainst: 0, note: "Вы забрали темп себе." },
-      { label: "Удар издали", risk: 20, energy: -10, goalsFor: 1, goalsAgainst: 0, note: "Дальний удар проверяет вратаря." },
+      { label: "Стремительный рейд", risk: 14, energy: -14, goalsFor: 1, goalsAgainst: 0, note: "Отряд резко ускорился." },
+      { label: "Удержать строй", risk: 4, energy: -6, goalsFor: 0, goalsAgainst: 0, note: "Отряд перехватил инициативу." },
+      { label: "Арканный залп", risk: 20, energy: -10, goalsFor: 1, goalsAgainst: 0, note: "Дальний залп пробивает оборону." },
     ],
   },
   {
     minute: 39,
-    title: "Давление соперника",
-    text: "Противник прижал отряд к воротам.",
+    title: "Натиск врага",
+    text: "Противник прижал отряд к каменным вратам.",
     options: [
-      { label: "Глухая защита", risk: 3, energy: -8, goalsFor: 0, goalsAgainst: 0, note: "Отряд терпит и закрывает зоны." },
-      { label: "Контратака", risk: 18, energy: -15, goalsFor: 1, goalsAgainst: 1, note: "Есть шанс наказать за давление." },
-      { label: "Высокий прессинг", risk: 12, energy: -18, goalsFor: 1, goalsAgainst: 0, note: "Игроки встречают соперника высоко." },
+      { label: "Каменный щит", risk: 3, energy: -8, goalsFor: 0, goalsAgainst: 0, note: "Отряд держит строй и закрывает проходы." },
+      { label: "Ответный выпад", risk: 18, energy: -15, goalsFor: 1, goalsAgainst: 1, note: "Есть шанс наказать врага за дерзкий натиск." },
+      { label: "Боевой нажим", risk: 12, energy: -18, goalsFor: 1, goalsAgainst: 0, note: "Герои встречают врага у передней линии." },
     ],
   },
   {
     minute: 63,
-    title: "Ключевой момент",
-    text: "Нужно решить, как играть середину второго тайма.",
+    title: "Перелом битвы",
+    text: "Нужно решить, как пройти середину сражения.",
     options: [
-      { label: "Сохранить силы", risk: 2, energy: 8, goalsFor: 0, goalsAgainst: 0, note: "Команда переводит дыхание." },
-      { label: "Всё в атаку", risk: 24, energy: -22, goalsFor: 2, goalsAgainst: 1, note: "Очень рискованный рывок." },
-      { label: "Баланс", risk: 8, energy: -9, goalsFor: 1, goalsAgainst: 0, note: "Спокойное, но опасное продвижение." },
+      { label: "Сберечь ману", risk: 2, energy: 8, goalsFor: 0, goalsAgainst: 0, note: "Отряд переводит дыхание." },
+      { label: "Общий штурм", risk: 24, energy: -22, goalsFor: 2, goalsAgainst: 1, note: "Очень рискованный штурм." },
+      { label: "Выверенный строй", risk: 8, energy: -9, goalsFor: 1, goalsAgainst: 0, note: "Спокойное, но опасное продвижение." },
     ],
   },
   {
     minute: 82,
-    title: "Финиш",
-    text: "Последние минуты. Одно решение может решить матч.",
+    title: "Последний натиск",
+    text: "Последний отрезок битвы. Один приказ может решить исход.",
     options: [
-      { label: "Удержать счёт", risk: 5, energy: -8, goalsFor: 0, goalsAgainst: 0, note: "Отряд играет аккуратно." },
-      { label: "Решающий штурм", risk: 22, energy: -18, goalsFor: 1, goalsAgainst: 1, note: "Финальная атака на максимуме." },
-      { label: "Индивидуальный проход", risk: 16, energy: -12, goalsFor: 1, goalsAgainst: 0, note: "Лидер берет игру на себя." },
+      { label: "Удержать врата", risk: 5, energy: -8, goalsFor: 0, goalsAgainst: 0, note: "Отряд бережёт преимущество." },
+      { label: "Решающий штурм", risk: 22, energy: -18, goalsFor: 1, goalsAgainst: 1, note: "Финальный штурм на пределе сил." },
+      { label: "Подвиг героя", risk: 16, energy: -12, goalsFor: 1, goalsAgainst: 0, note: "Лидер берёт исход на себя." },
     ],
   },
 ];
@@ -88,7 +88,7 @@ const state = {
   trophies: {},
   log: [],
   lastDailyBonusDate: null,
-  economyHint: "Сначала собери 4 игроков, потом усиливай состав.",
+  economyHint: "Сначала собери 4 героев, потом усиливай отряд.",
   lastOpenedPlayer: null,
   match: null,
   highlightPlayerId: null,
@@ -171,18 +171,18 @@ function firstAvailableTournament() {
 
 function recommendedAction() {
   if (state.match) {
-    return { label: "Продолжить матч", screen: "home" };
+    return { label: "Продолжить битву", screen: "home" };
   }
 
   if (squadPlayers().length < 4) {
-    return { label: "Открыть ящик", screen: "boxes" };
+    return { label: "Открыть сундук", screen: "boxes" };
   }
 
   if (firstAvailableTournament()) {
-    return { label: "Играть турнир", screen: "tournaments" };
+    return { label: "Начать испытание", screen: "tournaments" };
   }
 
-  return { label: "Усилить состав", screen: "boxes" };
+  return { label: "Усилить отряд", screen: "boxes" };
 }
 
 function handleMainCta() {
@@ -365,9 +365,9 @@ function loadGame() {
     state.log = Array.isArray(data.log) ? data.log.slice(0, 9) : [];
     state.lastDailyBonusDate = data.lastDailyBonusDate || null;
     state.lastOpenedPlayer = state.players.find((player) => player.id === data.lastOpenedPlayerId) || null;
-    addLog("Сохранённый прогресс загружен.");
+    addLog("Хроники отряда восстановлены.");
     if (state.lastDailyBonusDate === todayKey()) {
-      addLog("Ежедневный бонус уже получен сегодня.");
+      addLog("Ежедневный дар уже получен сегодня.");
     }
     return true;
   } catch {
@@ -378,7 +378,7 @@ function loadGame() {
 
 function claimDailyBonus() {
   if (state.lastDailyBonusDate === todayKey()) {
-    addLog("Ежедневный бонус уже получен сегодня.");
+    addLog("Ежедневный дар уже получен сегодня.");
     render();
     return;
   }
@@ -386,25 +386,25 @@ function claimDailyBonus() {
   state.coins += 3;
   state.lastDailyBonusDate = todayKey();
   state.dailyBonusPulse = true;
-  addLog("Ежедневный бонус получен: +3 монеты.");
+  addLog("Ежедневный дар получен: +3 золота.");
   render();
 }
 
 function openBox(box) {
   if (state.match) {
-    addLog("Сначала закончи текущий матч.");
+    addLog("Сначала заверши текущую битву.");
     render();
     return;
   }
 
   if (state.coins < box.price) {
-    addLog(`Не хватает монет для "${box.name}".`);
+    addLog(`Не хватает золота для "${box.name}".`);
     render();
     return;
   }
 
   if (state.players.length < 4 && box.price > boxes[0].price && state.coins - box.price < boxes[0].price) {
-    state.economyHint = "Сначала собери 4 игроков, потом усиливай состав.";
+    state.economyHint = "Сначала собери 4 героев, потом усиливай отряд.";
     addLog(state.economyHint);
   }
 
@@ -418,7 +418,7 @@ function openBox(box) {
   const emptySlot = state.squad.findIndex((id) => id === null);
   if (emptySlot !== -1) {
     state.squad[emptySlot] = player.id;
-    addLog(`${player.name} автоматически добавлен в отряд.`);
+    addLog(`${player.name} призван в отряд автоматически.`);
   }
 
   render();
@@ -441,7 +441,7 @@ function createPackBack(box) {
     <span class="pack-back__shine"></span>
     <span class="pack-back__mark">65</span>
     <strong>${box.name}</strong>
-    <small>Рейтинг ${box.min}-${box.max}</small>
+    <small>Ранг силы ${box.min}-${box.max}</small>
   `;
   return pack;
 }
@@ -459,7 +459,7 @@ function showPackOpening(box, player) {
   summary.innerHTML = `
     <span>${rarityName(player.rating)} · ${positionIcon(player.position)} ${player.position}</span>
     <strong>${player.rating} ${player.name}</strong>
-    <small>Игрок уже добавлен в коллекцию. Нажми “Забрать игрока”, чтобы закрыть показ.</small>
+    <small>Герой уже добавлен в архив. Нажми “Забрать героя”, чтобы закрыть показ.</small>
   `;
   stage.append(pack, revealedCard, summary);
   packRevealStageEl.append(stage);
@@ -495,7 +495,7 @@ function selectPlayer(playerId) {
 
 function selectBestSquad() {
   if (state.match) {
-    addLog("Состав нельзя менять во время матча.");
+    addLog("Отряд нельзя менять во время битвы.");
     render();
     return;
   }
@@ -526,25 +526,25 @@ function selectBestSquad() {
   const selectedPlayers = squadPlayers();
   const basePower = selectedPlayers.reduce((sum, player) => sum + player.rating, 0);
   const balance = balanceBonusFor(selectedPlayers);
-  addLog(`Лучший состав выбран: базовая сила ${basePower}, баланс ${balance}, итог ${basePower + balance}.`);
+  addLog(`Лучший отряд выбран: базовая сила ${basePower}, строй ${balance}, итог ${basePower + balance}.`);
   render();
 }
 
 function startTournament(tournament) {
   if (state.match) {
-    addLog("Матч уже идёт. Прими следующее решение.");
+    addLog("Битва уже идёт. Отдай следующий приказ.");
     render();
     return;
   }
 
   if (!fullSquad()) {
-    addLog(`Для турнира "${tournament.name}" нужен отряд из 4 персонажей.`);
+    addLog(`Для испытания "${tournament.name}" нужен отряд из 4 героев.`);
     render();
     return;
   }
 
   if (effectiveSquadPower() < tournament.required) {
-    addLog(`Для турнира "${tournament.name}" нужно ${tournament.required} силы с учётом баланса состава.`);
+    addLog(`Для испытания "${tournament.name}" нужно ${tournament.required} мощи с учётом строя отряда.`);
     render();
     return;
   }
@@ -559,7 +559,7 @@ function startTournament(tournament) {
   };
 
   activeScreen = "home";
-  addLog(`Начался матч: ${tournament.name}.`);
+  addLog(`Началась битва: ${tournament.name}.`);
   render();
 }
 
@@ -575,15 +575,15 @@ function chooseDecision(option) {
   match.energy = Math.max(0, Math.min(100, match.energy + option.energy));
   if (success) {
     match.playerGoals += option.goalsFor;
-    addLog(`${option.note} Решение сработало.`);
+    addLog(`${option.note} Приказ сработал.`);
   } else {
     match.rivalGoals += option.goalsAgainst || 1;
-    addLog(`${option.note} Соперник воспользовался ошибкой.`);
+    addLog(`${option.note} Враг воспользовался ошибкой.`);
   }
 
   if (match.energy < 25 && randomInt(1, 100) <= 35) {
     match.rivalGoals += 1;
-    addLog("Команда устала, и соперник забил на свежести.");
+    addLog("Отряд устал, и враг прорвал защиту.");
   }
 
   match.step += 1;
@@ -601,10 +601,10 @@ function finishMatch() {
     const powerRoll = effectiveSquadPower() + randomInt(-15, 15);
     if (powerRoll >= match.tournament.required) {
       match.playerGoals += 1;
-      addLog("В дополнительное время отряд дожал соперника.");
+      addLog("В последнем рывке отряд дожал врага.");
     } else {
       match.rivalGoals += 1;
-      addLog("Дополнительное время осталось за соперником.");
+      addLog("Последний рывок остался за врагом.");
     }
   }
 
@@ -612,11 +612,11 @@ function finishMatch() {
     state.coins += match.tournament.reward;
     state.trophies[match.tournament.trophy] = (state.trophies[match.tournament.trophy] || 0) + 1;
     addRankPoints(match.tournament.rp);
-    addLog(`Победа: ${match.tournament.trophy}! +${match.tournament.reward} монет, +${match.tournament.rp} RP.`);
+    addLog(`Победа: ${match.tournament.trophy}! +${match.tournament.reward} золота, +${match.tournament.rp} RP.`);
   } else {
     state.coins += 1;
     addRankPoints(5);
-    addLog(`Поражение в "${match.tournament.name}". +1 монета, +5 RP за опыт.`);
+    addLog(`Поражение в "${match.tournament.name}". +1 золотаа, +5 RP за опыт.`);
   }
 }
 
@@ -635,10 +635,10 @@ function startCleanGame({ clearStorage = true } = {}) {
   state.squad = [null, null, null, null];
   state.trophies = {};
   state.lastDailyBonusDate = null;
-  state.economyHint = "Сначала собери 4 игроков, потом усиливай состав.";
+  state.economyHint = "Сначала собери 4 героев, потом усиливай отряд.";
   state.lastOpenedPlayer = null;
   state.match = null;
-  state.log = ["Новая игра началась. Открой ящики и собери отряд."];
+  state.log = ["Новая хроника началась. Открывай сундуки и собирай отряд."];
   render();
 }
 
@@ -647,11 +647,11 @@ function resetGame() {
 }
 
 function positionIcon(position) {
-  return { ВР: "🧤", ЗЩ: "🛡️", ПЗ: "⚙️", НП: "⚡" }[position] || "●";
+  return { ВР: "◆", ЗЩ: "🛡️", ПЗ: "✦", НП: "⚔️" }[position] || "◆";
 }
 
 function positionLabel(position) {
-  return { ВР: "вратарь", ЗЩ: "защитник", ПЗ: "полузащитник", НП: "нападающий" }[position] || "игрок";
+  return { ВР: "страж", ЗЩ: "защитник", ПЗ: "тактик", НП: "авангард" }[position] || "герой";
 }
 
 function playerCard(player) {
@@ -701,7 +701,7 @@ function renderBoxes() {
         <strong>${box.name}</strong>
         <p>${box.note}</p>
         <div class="box-meta">
-          <span>Рейтинг ${box.min}-${box.max}</span>
+          <span>Ранг силы ${box.min}-${box.max}</span>
           <span class="price">🪙 ${box.price}</span>
         </div>
       </div>
@@ -740,7 +740,7 @@ function renderCollection() {
   collectionEl.replaceChildren();
   if (state.players.length === 0) {
     const empty = document.createElement("p");
-    empty.textContent = "Коллекция пока пустая.";
+    empty.textContent = "Архив героев пока пуст.";
     empty.className = "muted";
     collectionEl.append(empty);
     return;
@@ -763,14 +763,14 @@ function renderTournaments() {
     const shortage = Math.max(0, tournament.required - currentPower);
     const isCurrentMatch = state.match?.tournament.name === tournament.name;
     const availabilityText = isCurrentMatch
-      ? "Матч идёт"
+      ? "Битва идёт"
       : state.match
-        ? "Матч идёт"
+        ? "Битва идёт"
         : !hasFullSquad
-          ? "Нужен полный состав"
+          ? "Нужен полный отряд"
           : isAvailable
-            ? "Доступен"
-            : `Не хватает ${shortage} силы`;
+            ? "Доступно"
+            : `Не хватает ${shortage} мощи`;
     const statusClass = isCurrentMatch ? "live" : isAvailable ? "ok" : "warn";
     article.className = `tournament ${isCurrentMatch ? "matching" : isAvailable ? "available" : "unavailable"}`;
     article.innerHTML = `
@@ -778,7 +778,7 @@ function renderTournaments() {
         <strong>${tournament.name}</strong>
         <span class="trophy-mark" aria-label="Трофей">🏆</span>
       </div>
-      <p>Короткий матч с решениями.</p>
+      <p>Короткое испытание с тактическими приказами.</p>
       <div class="tournament-hints">
         <span><small>Нужно</small><strong>${tournament.required}</strong></span>
         <span><small>Сейчас</small><strong>${currentPower}</strong></span>
@@ -789,7 +789,7 @@ function renderTournaments() {
     `;
     const button = document.createElement("button");
     button.type = "button";
-    button.textContent = state.match ? "Матч уже идёт" : "Начать матч";
+    button.textContent = state.match ? "Битва идёт" : "Начать битву";
     button.disabled = !hasFullSquad || currentPower < tournament.required || Boolean(state.match);
     button.addEventListener("click", () => startTournament(tournament));
     article.append(button);
@@ -800,7 +800,7 @@ function renderTournaments() {
 function renderDailyBonus() {
   const claimed = state.lastDailyBonusDate === todayKey();
   dailyBonusEl.disabled = claimed;
-  dailyBonusEl.textContent = claimed ? "✅ Получен" : "🎁 Бонус +3";
+  dailyBonusEl.textContent = claimed ? "✓ Получен" : "✦ Дар +3";
   dailyBonusEl.classList.toggle("bonus-pulse", state.dailyBonusPulse);
   if (state.dailyBonusPulse) {
     window.setTimeout(() => {
@@ -811,7 +811,7 @@ function renderDailyBonus() {
 }
 
 function renderEconomyHint() {
-  economyHintEl.textContent = state.players.length < 4 ? state.economyHint : "Отряд собран. Теперь можно охотиться за усилениями.";
+  economyHintEl.textContent = state.players.length < 4 ? state.economyHint : "Отряд собран. Теперь можно искать редкие усиления.";
 }
 
 function renderLastOpening() {
@@ -832,7 +832,7 @@ function renderLastOpening() {
   const meta = document.createElement("div");
   meta.className = "last-opening-meta";
   meta.innerHTML = `
-    <span class="last-opening__label">Последнее открытие</span>
+    <span class="last-opening__label">Последний призыв</span>
     <strong>${player.rating} · ${player.name}</strong>
     <small>${positionIcon(player.position)} ${player.position} · ${rarity}</small>
   `;
@@ -848,7 +848,7 @@ function renderTrophies() {
   if (trophyNames.length === 0) {
     const empty = document.createElement("p");
     empty.className = "muted";
-    empty.textContent = "Трофеев пока нет.";
+    empty.textContent = "Реликвий и почестей пока нет.";
     trophiesEl.append(empty);
     return;
   }
@@ -866,13 +866,13 @@ function renderMatch() {
   matchPanelEl.classList.toggle("is-live", Boolean(state.match));
 
   if (!state.match) {
-    matchHintEl.textContent = "Выбери турнир, потом принимай решения в ключевых моментах игры.";
-    matchTournamentEl.textContent = "Нет матча";
+    matchHintEl.textContent = "Выбери испытание, потом отдавай приказы в ключевых моментах битвы.";
+    matchTournamentEl.textContent = "Нет битвы";
     matchScoreEl.textContent = "0 : 0";
     matchMinuteEl.textContent = "0'";
     matchEnergyEl.textContent = "100";
-    momentTitleEl.textContent = "Матч ещё не начался";
-    momentTextEl.textContent = "Собери полный отряд и нажми “Начать матч” в турнирах.";
+    momentTitleEl.textContent = "Битва ещё не началась";
+    momentTextEl.textContent = "Собери полный отряд и нажми “Начать битву” в испытаниях.";
     return;
   }
 
@@ -884,18 +884,18 @@ function renderMatch() {
   matchEnergyEl.textContent = match.energy;
 
   if (match.finished) {
-    matchHintEl.textContent = "Матч завершён. Можно забрать результат и выбрать следующий турнир.";
-    momentTitleEl.textContent = match.playerGoals > match.rivalGoals ? "Победа!" : "Матч проигран";
+    matchHintEl.textContent = "Битва завершена. Забери исход и выбери следующее испытание.";
+    momentTitleEl.textContent = match.playerGoals > match.rivalGoals ? "Победа!" : "Битва проиграна";
     momentTextEl.textContent = `Итоговый счёт: ${match.playerGoals} : ${match.rivalGoals}.`;
     const button = document.createElement("button");
     button.type = "button";
-    button.innerHTML = "<strong>Завершить матч</strong><span>Забрать результат</span>";
+    button.innerHTML = "<strong>Завершить битву</strong><span>Забрать итог</span>";
     button.addEventListener("click", closeFinishedMatch);
     decisionButtonsEl.append(button);
     return;
   }
 
-  matchHintEl.textContent = "Выбери действие. Рискованные решения могут дать гол, но могут открыть сопернику шанс.";
+  matchHintEl.textContent = "Выбери приказ. Рискованные манёвры могут дать преимущество, но открыть врагу шанс.";
   momentTitleEl.textContent = moment.title;
   momentTextEl.textContent = moment.text;
   moment.options.forEach((option) => {

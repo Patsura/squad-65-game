@@ -12,24 +12,24 @@
         <div class="brand" aria-label="Squad 65">
           <span class="brand-mark" aria-hidden="true">65</span>
           <div>
-            <p class="kicker">football cards</p>
+            <p class="kicker">fantasy roster</p>
             <h1>Squad 65</h1>
           </div>
         </div>
 
         <div class="hud-stats">
           <div class="hud-pill coins-pill">
-            <span aria-hidden="true">🪙</span>
-            <small>Монеты</small>
+            <span aria-hidden="true">✦</span>
+            <small>Золото</small>
             <strong id="coins">0</strong>
           </div>
           <div class="hud-pill rank-pill">
-            <span aria-hidden="true">🏆</span>
-            <small>Ранг</small>
+            <span aria-hidden="true">◆</span>
+            <small>Титул</small>
             <strong id="rankName">Новичок I</strong>
             <em id="rankProgress">0 / 20 RP</em>
           </div>
-          <button id="dailyBonus" type="button" class="daily-bonus">🎁 +3</button>
+          <button id="dailyBonus" type="button" class="daily-bonus">✦ Дар +3</button>
         </div>
       </header>
 
@@ -46,20 +46,20 @@
           <div id="matchPanel" class="match-card" aria-labelledby="matchTitle">
             <div class="section-head compact-head">
               <div>
-                <p class="kicker">матч</p>
-                <h2 id="matchTitle">Матч</h2>
+                <p class="kicker">битва</p>
+                <h2 id="matchTitle">Боевой хроникон</h2>
               </div>
-              <p id="matchHint">Выбери турнир и принимай решения.</p>
+              <p id="matchHint">Выбери испытание и отдавай приказы.</p>
             </div>
             <div class="scoreboard">
-              <div><span>Турнир</span><strong id="matchTournament">Нет матча</strong></div>
+              <div><span>Испытание</span><strong id="matchTournament">Нет битвы</strong></div>
               <div><span>Счёт</span><strong id="matchScore">0 : 0</strong></div>
               <div><span>Минута</span><strong id="matchMinute">0'</strong></div>
               <div><span>Энергия</span><strong id="matchEnergy">100</strong></div>
             </div>
             <div class="moment">
-              <strong id="momentTitle">Матч ещё не начался</strong>
-              <p id="momentText">Собери полный отряд и нажми “Начать матч” в турнирах.</p>
+              <strong id="momentTitle">Битва ещё не началась</strong>
+              <p id="momentText">Собери полный отряд и нажми “Начать битву” в испытаниях.</p>
             </div>
             <div id="decisionButtons" class="decision-grid"></div>
           </div>
@@ -67,42 +67,42 @@
           <section class="squad-card" aria-labelledby="homeTitle">
             <div class="section-head hero-head">
               <div>
-                <p class="kicker">главная</p>
-                <h2 id="homeTitle">Мой состав</h2>
+                <p class="kicker">цитадель</p>
+                <h2 id="homeTitle">Отряд героев</h2>
               </div>
               <div class="hero-actions">
-                <button id="autoSquad" type="button" class="ghost small-action">Лучший состав</button>
+                <button id="autoSquad" type="button" class="ghost small-action">Лучший отряд</button>
                 <button id="resetGame" type="button" class="ghost small-action">Новая игра</button>
               </div>
             </div>
 
-            <div class="pitch" aria-label="4 слота состава">
+            <div class="pitch" aria-label="4 слота отряда">
               <div class="slot" data-slot="0" data-position="ВР"><span class="slot-placeholder">ВР</span></div>
               <div class="slot" data-slot="1" data-position="ЗЩ"><span class="slot-placeholder">ЗЩ</span></div>
               <div class="slot" data-slot="2" data-position="ПЗ"><span class="slot-placeholder">ПЗ</span></div>
               <div class="slot" data-slot="3" data-position="НП"><span class="slot-placeholder">НП</span></div>
             </div>
 
-            <div class="power-panel" aria-label="Сила состава">
+            <div class="power-panel" aria-label="Мощь отряда">
               <div>
-                <span>База</span>
+                <span>Сила</span>
                 <strong id="squadPower">0</strong>
               </div>
               <div>
-                <span>Баланс</span>
+                <span>Строй</span>
                 <strong id="balanceBonus">+0</strong>
               </div>
               <div class="effective">
-                <span>Итог</span>
+                <span>Мощь</span>
                 <strong id="effectivePower">0</strong>
               </div>
             </div>
 
-            <button id="mainCta" type="button" class="main-cta">Открыть ящик</button>
+            <button id="mainCta" type="button" class="main-cta">Открыть сундук</button>
           </section>
 
           <section id="latestSection" class="latest-section" aria-labelledby="latestTitle" hidden>
-            <p class="kicker" id="latestTitle">Последнее открытие</p>
+            <p class="kicker" id="latestTitle">Последний призыв</p>
             <div id="lastOpening" class="last-opening" aria-live="polite"></div>
           </section>
         </section>
@@ -110,10 +110,10 @@
         <section class="screen" data-screen="boxes" aria-labelledby="boxesTitle">
           <div class="section-head">
             <div>
-              <p class="kicker">усиление</p>
-              <h2 id="boxesTitle">Ящики</h2>
+              <p class="kicker">сокровищница</p>
+              <h2 id="boxesTitle">Сундуки</h2>
             </div>
-            <p id="economyHint" class="economy-hint">Сначала собери 4 игроков, потом усиливай состав.</p>
+            <p id="economyHint" class="economy-hint">Сначала собери 4 героев, потом усиливай отряд.</p>
           </div>
           <div id="boxes" class="box-grid"></div>
         </section>
@@ -122,9 +122,9 @@
           <div class="section-head">
             <div>
               <p class="kicker">испытания</p>
-              <h2 id="tournamentsTitle">Турниры</h2>
+              <h2 id="tournamentsTitle">Испытания</h2>
             </div>
-            <p>Полный состав открывает матчи.</p>
+            <p>Полный отряд открывает боевые испытания.</p>
           </div>
           <div id="tournaments" class="tournament-list"></div>
         </section>
@@ -132,10 +132,10 @@
         <section class="screen" data-screen="collection" aria-labelledby="collectionTitle">
           <div class="section-head">
             <div>
-              <p class="kicker">скамейка</p>
-              <h2 id="collectionTitle">Коллекция</h2>
+              <p class="kicker">архив</p>
+              <h2 id="collectionTitle">Архив героев</h2>
             </div>
-            <p>Нажми карту, чтобы менять состав.</p>
+            <p>Нажми карту героя, чтобы менять отряд.</p>
           </div>
           <div id="trophies" class="trophy-list" aria-label="Трофеи"></div>
           <div id="collection" class="collection"></div>
@@ -150,9 +150,9 @@
 
     <nav class="bottom-nav" aria-label="Разделы игры">
       <button type="button" class="nav-button active" data-target="home" aria-current="page"><span>🏠</span>Главная</button>
-      <button type="button" class="nav-button" data-target="boxes"><span>📦</span>Ящики</button>
-      <button type="button" class="nav-button" data-target="tournaments"><span>🏆</span>Турниры</button>
-      <button type="button" class="nav-button" data-target="collection"><span>👥</span>Коллекция</button>
+      <button type="button" class="nav-button" data-target="boxes"><span>✦</span>Сундуки</button>
+      <button type="button" class="nav-button" data-target="tournaments"><span>⚔️</span>Испытания</button>
+      <button type="button" class="nav-button" data-target="collection"><span>◆</span>Архив</button>
     </nav>
 
     <template id="playerTemplate">
@@ -173,10 +173,10 @@
     <div id="packOpening" class="pack-opening" aria-hidden="true">
       <div class="pack-opening__panel" role="dialog" aria-modal="true" aria-labelledby="packOpeningTitle">
         <button id="closePackOpening" class="pack-opening__close" type="button" aria-label="Закрыть открытие">×</button>
-        <p class="kicker">новая карта</p>
-        <h2 id="packOpeningTitle">Открытие ящика</h2>
+        <p class="kicker">магический призыв</p>
+        <h2 id="packOpeningTitle">Открытие реликвии</h2>
         <div id="packRevealStage" class="pack-reveal-stage"></div>
-        <button id="claimPackPlayer" class="pack-opening__claim" type="button">Забрать игрока</button>
+        <button id="claimPackPlayer" class="pack-opening__claim" type="button">Забрать героя</button>
       </div>
     </div>
 
