@@ -7,17 +7,18 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <section class="topbar" aria-label="Игровой HUD">
-        <div class="brand">
+    <main class="app-shell">
+      <header class="topbar" aria-label="Игровой HUD">
+        <div class="brand" aria-label="Squad 65">
           <span class="brand-mark" aria-hidden="true">65</span>
           <div>
             <p class="kicker">football cards</p>
             <h1>Squad 65</h1>
           </div>
         </div>
+
         <div class="hud-stats">
-          <div class="hud-pill">
+          <div class="hud-pill coins-pill">
             <span aria-hidden="true">🪙</span>
             <small>Монеты</small>
             <strong id="coins">0</strong>
@@ -28,9 +29,9 @@
             <strong id="rankName">Новичок I</strong>
             <em id="rankProgress">0 / 20 RP</em>
           </div>
-          <button id="dailyBonus" type="button" class="daily-bonus">🎁 Бонус +3</button>
+          <button id="dailyBonus" type="button" class="daily-bonus">🎁 +3</button>
         </div>
-      </section>
+      </header>
 
       <section class="rank-strip" aria-label="Прогресс ранга">
         <div class="rank-info">
@@ -40,127 +41,119 @@
         <div class="rank-meter" aria-hidden="true"><span id="rankFill"></span></div>
       </section>
 
-      <section class="squad-hero" aria-labelledby="squadTitle">
-        <div class="section-head hero-head">
-          <div>
-            <p class="kicker">главный экран</p>
-            <h2 id="squadTitle">Мой состав</h2>
-          </div>
-          <div class="hero-actions">
-            <button id="autoSquad" type="button" class="primary-action">✨ Лучший состав</button>
-            <button id="resetGame" type="button" class="ghost">Новая игра</button>
-          </div>
-        </div>
-        <div class="squad-board">
-          <div class="pitch" aria-label="4 слота состава">
-            <div class="slot" data-slot="0" data-position="ВР"><span class="slot-placeholder">ВР</span></div>
-            <div class="slot" data-slot="1" data-position="ЗЩ"><span class="slot-placeholder">ЗЩ</span></div>
-            <div class="slot" data-slot="2" data-position="ПЗ"><span class="slot-placeholder">ПЗ</span></div>
-            <div class="slot" data-slot="3" data-position="НП"><span class="slot-placeholder">НП</span></div>
-          </div>
-          <aside class="power-panel" aria-label="Сила состава">
-            <span class="panel-label">Сила состава</span>
-            <strong id="squadPower">0</strong>
-            <p id="balanceBonus">Баланс состава: 0</p>
-            <p id="effectivePower" class="effective">Итоговая сила: 0</p>
-            <span class="next-step">Открой ящики, собери 4 роли и выходи в турнир.</span>
-          </aside>
-        </div>
-      </section>
-
-      <section class="section latest-section" aria-labelledby="latestTitle">
-        <div class="section-head">
-          <div>
-            <p class="kicker">эмоция ящика</p>
-            <h2 id="latestTitle">Последнее открытие</h2>
-          </div>
-          <p>Новый игрок появляется здесь крупнее обычного.</p>
-        </div>
-        <div id="lastOpening" class="last-opening" aria-live="polite">
-          <span class="last-opening__label">Последнее открытие</span>
-          <strong>Пока нет открытий</strong>
-          <small>Открой ящик, чтобы увидеть нового игрока.</small>
-        </div>
-      </section>
-
-      <section class="section packs-section" aria-labelledby="boxesTitle">
-        <div class="section-head">
-          <div>
-            <p class="kicker">усиление</p>
-            <h2 id="boxesTitle">Ящики</h2>
-          </div>
-          <p id="economyHint" class="economy-hint">Сначала собери 4 игроков, потом усиливай состав.</p>
-        </div>
-        <div id="boxes" class="box-grid"></div>
-      </section>
-
-      <section class="section tournaments-section" aria-labelledby="tournamentsTitle">
-        <div class="section-head">
-          <div>
-            <p class="kicker">испытания</p>
-            <h2 id="tournamentsTitle">Турниры</h2>
-          </div>
-          <p>Победы дают монеты, RP и трофеи. Нужен полный состав.</p>
-        </div>
-        <div id="tournaments" class="tournament-list"></div>
-      </section>
-
-      <section class="match section" id="matchPanel" aria-labelledby="matchTitle">
-        <div class="section-head">
-          <div>
-            <p class="kicker">ключевые решения</p>
-            <h2 id="matchTitle">Матч</h2>
-          </div>
-          <p id="matchHint">Выбери турнир, потом принимай решения в ключевых моментах игры.</p>
-        </div>
-        <div class="scoreboard">
-          <div><span>Турнир</span><strong id="matchTournament">Нет матча</strong></div>
-          <div class="score-cell"><span>Счёт</span><strong id="matchScore">0 : 0</strong></div>
-          <div><span>Минута</span><strong id="matchMinute">0'</strong></div>
-          <div><span>Энергия</span><strong id="matchEnergy">100</strong></div>
-        </div>
-        <div class="moment">
-          <strong id="momentTitle">Матч ещё не начался</strong>
-          <p id="momentText">Собери полный отряд и нажми “Начать матч” в турнирах.</p>
-        </div>
-        <div id="decisionButtons" class="decision-grid"></div>
-      </section>
-
-      <section class="section collection-section" aria-labelledby="collectionTitle">
-        <div class="section-head compact-head">
-          <div>
-            <p class="kicker">скамейка</p>
-            <h2 id="collectionTitle">Коллекция</h2>
-          </div>
-          <p>Игроки отсортированы по рейтингу. Нажми карту, чтобы добавить или убрать из состава.</p>
-        </div>
-        <div id="collection" class="collection"></div>
-      </section>
-
-      <section class="secondary-grid">
-        <div class="section trophies-section">
-          <div class="section-head compact-head">
-            <div>
-              <p class="kicker">награды</p>
-              <h2>Трофеи</h2>
+      <div class="screen-stack">
+        <section class="screen active" data-screen="home" aria-labelledby="homeTitle">
+          <div id="matchPanel" class="match-card" aria-labelledby="matchTitle">
+            <div class="section-head compact-head">
+              <div>
+                <p class="kicker">матч</p>
+                <h2 id="matchTitle">Матч</h2>
+              </div>
+              <p id="matchHint">Выбери турнир и принимай решения.</p>
             </div>
-            <p>Кубки за победы.</p>
-          </div>
-          <div id="trophies" class="trophy-list"></div>
-        </div>
-
-        <div class="section log-section">
-          <div class="section-head compact-head">
-            <div>
-              <p class="kicker">события</p>
-              <h2>Журнал</h2>
+            <div class="scoreboard">
+              <div><span>Турнир</span><strong id="matchTournament">Нет матча</strong></div>
+              <div><span>Счёт</span><strong id="matchScore">0 : 0</strong></div>
+              <div><span>Минута</span><strong id="matchMinute">0'</strong></div>
+              <div><span>Энергия</span><strong id="matchEnergy">100</strong></div>
             </div>
-            <p>Последние действия.</p>
+            <div class="moment">
+              <strong id="momentTitle">Матч ещё не начался</strong>
+              <p id="momentText">Собери полный отряд и нажми “Начать матч” в турнирах.</p>
+            </div>
+            <div id="decisionButtons" class="decision-grid"></div>
           </div>
-          <ol id="log" class="log"></ol>
-        </div>
-      </section>
+
+          <section class="squad-card" aria-labelledby="homeTitle">
+            <div class="section-head hero-head">
+              <div>
+                <p class="kicker">главная</p>
+                <h2 id="homeTitle">Мой состав</h2>
+              </div>
+              <div class="hero-actions">
+                <button id="autoSquad" type="button" class="ghost small-action">Лучший состав</button>
+                <button id="resetGame" type="button" class="ghost small-action">Новая игра</button>
+              </div>
+            </div>
+
+            <div class="pitch" aria-label="4 слота состава">
+              <div class="slot" data-slot="0" data-position="ВР"><span class="slot-placeholder">ВР</span></div>
+              <div class="slot" data-slot="1" data-position="ЗЩ"><span class="slot-placeholder">ЗЩ</span></div>
+              <div class="slot" data-slot="2" data-position="ПЗ"><span class="slot-placeholder">ПЗ</span></div>
+              <div class="slot" data-slot="3" data-position="НП"><span class="slot-placeholder">НП</span></div>
+            </div>
+
+            <div class="power-panel" aria-label="Сила состава">
+              <div>
+                <span>База</span>
+                <strong id="squadPower">0</strong>
+              </div>
+              <div>
+                <span>Баланс</span>
+                <strong id="balanceBonus">+0</strong>
+              </div>
+              <div class="effective">
+                <span>Итог</span>
+                <strong id="effectivePower">0</strong>
+              </div>
+            </div>
+
+            <button id="mainCta" type="button" class="main-cta">Открыть ящик</button>
+          </section>
+
+          <section id="latestSection" class="latest-section" aria-labelledby="latestTitle" hidden>
+            <p class="kicker" id="latestTitle">Последнее открытие</p>
+            <div id="lastOpening" class="last-opening" aria-live="polite"></div>
+          </section>
+        </section>
+
+        <section class="screen" data-screen="boxes" aria-labelledby="boxesTitle">
+          <div class="section-head">
+            <div>
+              <p class="kicker">усиление</p>
+              <h2 id="boxesTitle">Ящики</h2>
+            </div>
+            <p id="economyHint" class="economy-hint">Сначала собери 4 игроков, потом усиливай состав.</p>
+          </div>
+          <div id="boxes" class="box-grid"></div>
+        </section>
+
+        <section class="screen" data-screen="tournaments" aria-labelledby="tournamentsTitle">
+          <div class="section-head">
+            <div>
+              <p class="kicker">испытания</p>
+              <h2 id="tournamentsTitle">Турниры</h2>
+            </div>
+            <p>Полный состав открывает матчи.</p>
+          </div>
+          <div id="tournaments" class="tournament-list"></div>
+        </section>
+
+        <section class="screen" data-screen="collection" aria-labelledby="collectionTitle">
+          <div class="section-head">
+            <div>
+              <p class="kicker">скамейка</p>
+              <h2 id="collectionTitle">Коллекция</h2>
+            </div>
+            <p>Нажми карту, чтобы менять состав.</p>
+          </div>
+          <div id="trophies" class="trophy-list" aria-label="Трофеи"></div>
+          <div id="collection" class="collection"></div>
+
+          <details class="log-section">
+            <summary>Показать журнал</summary>
+            <ol id="log" class="log"></ol>
+          </details>
+        </section>
+      </div>
     </main>
+
+    <nav class="bottom-nav" aria-label="Разделы игры">
+      <button type="button" class="nav-button active" data-target="home" aria-current="page"><span>🏠</span>Главная</button>
+      <button type="button" class="nav-button" data-target="boxes"><span>📦</span>Ящики</button>
+      <button type="button" class="nav-button" data-target="tournaments"><span>🏆</span>Турниры</button>
+      <button type="button" class="nav-button" data-target="collection"><span>👥</span>Коллекция</button>
+    </nav>
 
     <template id="playerTemplate">
       <button class="player-card" type="button">
