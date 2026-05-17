@@ -480,7 +480,7 @@ function resetGame() {
 }
 
 function positionIcon(position) {
-  return { ВР: "🧤", ЗЩ: "🛡️", ПЗ: "🎯", НП: "⚡" }[position] || "●";
+  return { ВР: "🧤", ЗЩ: "🛡️", ПЗ: "⚙️", НП: "⚡" }[position] || "●";
 }
 
 function playerCard(player) {
@@ -490,6 +490,7 @@ function playerCard(player) {
   node.querySelector(".rating").textContent = player.rating;
   node.querySelector(".name").textContent = player.name;
   node.querySelector(".position").textContent = `${positionIcon(player.position)} ${player.position}`;
+  node.querySelector(".avatar-icon").textContent = positionIcon(player.position);
   node.querySelector(".rarity").textContent = rarityName(player.rating);
   node.querySelector(".source").textContent = player.source;
   node.addEventListener("click", () => selectPlayer(player.id));
@@ -520,8 +521,10 @@ function renderBoxes() {
     article.innerHTML = `
       <strong>${box.name}</strong>
       <p>${box.note}</p>
-      <span>Диапазон рейтинга: ${box.min}-${box.max}</span>
-      <span class="price">🪙 ${box.price} монеты</span>
+      <div class="box-meta">
+        <span>⭐ ${box.min}-${box.max}</span>
+        <span class="price">🪙 ${box.price}</span>
+      </div>
     `;
     const button = document.createElement("button");
     button.type = "button";
@@ -542,7 +545,7 @@ function renderSquad() {
     } else {
       const placeholder = document.createElement("span");
       placeholder.className = "slot-placeholder";
-      placeholder.textContent = positions[index];
+      placeholder.innerHTML = `<strong>${positionIcon(positions[index])} ${positions[index]}</strong><small>Пустой слот</small>`;
       slot.append(placeholder);
     }
   });
@@ -581,9 +584,13 @@ function renderTournaments() {
     const isCurrentMatch = state.match?.tournament.name === tournament.name;
     const availabilityText = isCurrentMatch
       ? "Матч идёт"
-      : isAvailable
-        ? "Доступен"
-        : `Не хватает ${shortage} силы${hasFullSquad ? "" : " · нужен полный отряд"}`;
+      : state.match
+        ? "Матч идёт"
+        : !hasFullSquad
+          ? "Нужен полный состав"
+          : isAvailable
+            ? "Доступен"
+            : `Не хватает ${shortage} силы`;
     const statusClass = isCurrentMatch ? "live" : isAvailable ? "ok" : "warn";
     article.className = `tournament ${isCurrentMatch ? "matching" : isAvailable ? "available" : "unavailable"}`;
     article.innerHTML = `
@@ -591,7 +598,7 @@ function renderTournaments() {
         <strong>${tournament.name}</strong>
         <span class="trophy-mark" aria-label="Трофей">🏆</span>
       </div>
-      <p>Награда: ${tournament.reward} монет и ${tournament.rp} RP. Трофей: ${tournament.trophy}.</p>
+      <p>Собери силу, проверь статус и запускай матч, когда карточка станет доступна.</p>
       <div class="tournament-hints">
         <span><small>Нужно силы</small><strong>${tournament.required}</strong></span>
         <span><small>Моя итоговая сила</small><strong>${currentPower}</strong></span>
@@ -627,7 +634,7 @@ function renderLastOpening() {
     lastOpeningEl.innerHTML = `
       <span class="last-opening__label">Последнее открытие</span>
       <strong>Пока нет открытий</strong>
-      <small>Открой ящик, чтобы увидеть нового игрока здесь.</small>
+      <small>Открой ящик, чтобы увидеть нового игрока.</small>
     `;
     return;
   }
@@ -695,7 +702,7 @@ function renderMatch() {
     momentTextEl.textContent = `Итоговый счёт: ${match.playerGoals} : ${match.rivalGoals}.`;
     const button = document.createElement("button");
     button.type = "button";
-    button.textContent = "Завершить матч";
+    button.innerHTML = "<strong>Завершить матч</strong><span>Забрать результат</span>";
     button.addEventListener("click", closeFinishedMatch);
     decisionButtonsEl.append(button);
     return;
