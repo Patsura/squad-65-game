@@ -969,3 +969,230 @@ h1, h2 {
 .player-card::after { z-index: 0; }
 .player-card > * { position: relative; z-index: 1; }
 .player-card.in-squad::after { z-index: 2; border: 0; background: var(--green); }
+
+/* Readability cleanup: keep the fantasy mood controlled and mobile-first. */
+body {
+  background:
+    radial-gradient(circle at 12% -8%, rgba(51, 120, 135, .18), transparent 16rem),
+    radial-gradient(circle at 94% 4%, rgba(112, 68, 152, .12), transparent 14rem),
+    linear-gradient(180deg, #08131d 0%, #090d14 52%, #05070b 100%);
+}
+body::before { opacity: .16; }
+
+.app-shell { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+.topbar,
+.rank-strip,
+.squad-card,
+.match-card,
+.latest-section,
+.screen:not([data-screen="home"]),
+.bottom-nav {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.035), transparent 34%),
+    linear-gradient(135deg, rgba(30, 37, 47, .96), rgba(12, 17, 25, .98));
+  box-shadow: 0 10px 24px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.025);
+}
+h1,
+h2 { text-shadow: 0 1px 0 rgba(0,0,0,.45); }
+.kicker { text-shadow: none; }
+button { box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 6px 14px rgba(0,0,0,.18); }
+
+.pitch {
+  gap: 7px;
+  padding: 7px;
+  border-color: rgba(233, 189, 99, .22);
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255,255,255,.014) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(18, 47, 44, .54), rgba(15, 20, 29, .9));
+  background-size: 32px 32px, 32px 32px, auto;
+  box-shadow: inset 0 0 16px rgba(0,0,0,.26);
+}
+.pitch::before { opacity: .35; }
+.slot {
+  min-height: 76px;
+  overflow: hidden;
+  border-color: rgba(233, 189, 99, .22);
+  background: linear-gradient(145deg, rgba(10,15,22,.66), rgba(30,35,43,.48));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
+}
+.slot::before,
+.slot::after { opacity: .38; }
+.slot-placeholder { color: #b9ad95; font-size: 11px; }
+.slot-placeholder strong { color: #f4dda0; font-size: 13px; }
+
+.player-card {
+  border-width: 1px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 8px 16px rgba(0,0,0,.2);
+}
+.player-card::before { opacity: .34; }
+.player-card::after { opacity: .22; border-color: rgba(255,255,255,.08); }
+.player-card.legend::before { animation: none; }
+.player-card.rare,
+.player-card.elite,
+.player-card.legend { box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 9px 18px rgba(0,0,0,.24); }
+.rating { text-shadow: 0 1px 0 rgba(0,0,0,.55); }
+
+.avatar {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(233,189,99,.34);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,.13), transparent 32%),
+    linear-gradient(160deg, rgba(47,60,76,.92), rgba(7,11,17,.96));
+  box-shadow: inset 0 0 0 3px rgba(0,0,0,.18);
+  contain: paint;
+}
+.portrait { inset: 0; overflow: hidden; border-radius: inherit; --skin: #d79a69; --hair: #2a1d18; }
+.portrait-glow {
+  inset: 7px;
+  opacity: .32;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--pos) 25%, transparent), transparent 64%);
+  animation: none;
+}
+.portrait-kit {
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 17px;
+  border-radius: 12px 12px 4px 4px;
+  background: linear-gradient(135deg, #1d2b39, color-mix(in srgb, var(--pos) 68%, #29313d));
+}
+.portrait-neck { left: 23px; bottom: 14px; width: 8px; height: 9px; }
+.portrait-head {
+  left: 15px;
+  top: 11px;
+  width: 24px;
+  height: 27px;
+  border-radius: 48% 48% 45% 45%;
+  background: var(--skin);
+  box-shadow: inset -3px -4px 0 rgba(0,0,0,.09);
+}
+.portrait-badge {
+  right: 3px;
+  bottom: 3px;
+  width: 17px;
+  height: 17px;
+  background: rgba(7, 12, 18, .92);
+}
+
+.slot .player-card,
+.slot .player-card.compact-card {
+  min-height: 74px;
+  max-height: 82px;
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  grid-template-rows: auto 1fr;
+  gap: 3px 6px;
+  padding: 7px;
+  border-radius: 13px;
+  outline: 0;
+  text-align: left;
+}
+.slot .player-card::after,
+.slot .player-card.in-squad::after { display: none; content: none; }
+.slot .card-topline { grid-column: 1; min-width: 0; align-items: center; }
+.slot .rating { font-size: 23px; line-height: .9; padding: 0; background: transparent; }
+.slot .position { min-width: 30px; padding: 3px 5px; border-radius: 8px; font-size: 10px; }
+.slot .avatar {
+  display: grid;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  justify-self: end;
+  width: 32px;
+  height: 32px;
+  border-width: 1px;
+}
+.slot .portrait-kit { left: 6px; right: 6px; bottom: -1px; height: 10px; border-radius: 8px 8px 3px 3px; }
+.slot .portrait-kit span { opacity: .55; transform: translateX(-50%) scale(.62); transform-origin: top center; }
+.slot .portrait-neck { left: 13px; bottom: 8px; width: 5px; height: 6px; }
+.slot .portrait-head { left: 8px; top: 6px; width: 15px; height: 17px; transform: none; }
+.slot .portrait-hair { left: -1px; top: -2px; width: 17px; height: 8px; }
+.slot .portrait-eyes { left: 4px; top: 9px; width: 7px; transform: scale(.65); transform-origin: left top; }
+.slot .portrait-mouth { left: 5px; top: 13px; width: 5px; height: 2px; border-bottom-width: 1px; }
+.slot .portrait-shine { right: 2px; top: 4px; width: 3px; height: 6px; }
+.slot .portrait-badge { display: none; }
+.slot .card-info { grid-column: 1; align-self: end; gap: 1px; min-width: 0; }
+.slot .name { max-width: 100%; color: #fff2ce; font-size: 12px; line-height: 1.05; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.slot .rarity { font-size: 9px; line-height: 1; color: #d9bf7d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.slot .source { display: none !important; }
+.slot .player-card.common { border-color: rgba(205,211,205,.28); }
+.slot .player-card.rare { border-color: rgba(78,184,255,.58); }
+.slot .player-card.elite { border-color: rgba(240,201,111,.68); }
+.slot .player-card.legend { border-color: rgba(255,95,134,.72); }
+
+.power-panel { gap: 6px; margin-top: 8px; }
+.power-panel > div { padding: 8px; border-color: rgba(233,189,99,.18); box-shadow: none; }
+.power-panel .effective { background: linear-gradient(135deg, rgba(24,48,37,.72), rgba(9,14,21,.92)); }
+.main-cta {
+  min-height: 48px;
+  box-shadow: 0 8px 18px rgba(201,135,42,.2), inset 0 1px 0 rgba(255,255,255,.34);
+}
+
+.bottom-nav {
+  gap: 5px;
+  padding: 6px 10px calc(6px + env(safe-area-inset-bottom));
+  border-top-color: rgba(233,189,99,.2);
+  box-shadow: 0 -8px 18px rgba(0,0,0,.26);
+}
+.nav-button {
+  min-height: 44px;
+  gap: 1px;
+  padding: 4px 2px;
+  border-radius: 12px;
+  font-size: 10px;
+  background: transparent;
+  box-shadow: none;
+}
+.nav-button span { font-size: 15px; }
+.nav-button.active {
+  color: #fff1c5;
+  border-color: rgba(233,189,99,.42);
+  background: linear-gradient(180deg, rgba(233,189,99,.13), rgba(255,255,255,.025));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.035);
+}
+
+.pack-opening { padding: 10px; background: rgba(3,5,9,.78); }
+.pack-opening__panel {
+  width: min(100%, 348px);
+  max-height: calc(100dvh - 20px);
+  overflow: auto;
+  gap: 9px;
+  padding: 14px;
+  border-radius: 20px;
+  background: radial-gradient(circle at 50% -8%, rgba(233,189,99,.16), transparent 28%), #0d131d;
+  box-shadow: 0 18px 46px rgba(0,0,0,.58);
+}
+.pack-opening__panel::before,
+.pack-opening__panel::after { opacity: .45; }
+.pack-reveal-stage { min-height: 276px; }
+.pack-reveal::before { width: 188px; height: 188px; opacity: .55; filter: none; }
+.pack-reveal::after { opacity: .45; letter-spacing: 18px; }
+.revealed-card { width: 166px; min-height: 218px; }
+.revealed-card .avatar { width: 66px; height: 66px; justify-self: center; }
+.revealed-card .portrait-head { transform: none; }
+.pack-result-copy small { font-size: 12px; }
+
+@media (max-width: 420px) {
+  .app-shell { gap: 8px; padding-inline: 8px; }
+  .squad-card,
+  .latest-section,
+  .match-card,
+  .screen { padding: 10px; }
+  .section-head { margin-bottom: 9px; }
+  h2 { font-size: 20px; }
+  .hero-actions { gap: 4px; }
+  .small-action { min-height: 32px; padding-inline: 8px; font-size: 11px; }
+  .player-card { min-height: 140px; }
+  .avatar { width: 54px; height: 54px; }
+  .slot { min-height: 76px; }
+  .slot .player-card { min-height: 74px; }
+  .scoreboard { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
