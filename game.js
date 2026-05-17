@@ -76,6 +76,9 @@ const firstNames = ["Алекс", "Никита", "Марк", "Даниил", "�
 const lastNames = ["Волков", "Орлов", "Соколов", "Морозов", "Белов", "Громов", "Егоров", "Фомин", "Лукин", "Титов"];
 const positions = ["ВР", "ЗЩ", "ПЗ", "НП"];
 const saveKey = "squad65-save-v1";
+const screenButtons = document.querySelectorAll(".nav-button");
+const screens = document.querySelectorAll(".screen");
+let activeScreen = "home";
 
 const state = {
   coins: 12,
@@ -115,11 +118,61 @@ const dailyBonusEl = document.querySelector("#dailyBonus");
 const economyHintEl = document.querySelector("#economyHint");
 const trophiesEl = document.querySelector("#trophies");
 const lastOpeningEl = document.querySelector("#lastOpening");
+const latestSectionEl = document.querySelector("#latestSection");
+const matchPanelEl = document.querySelector("#matchPanel");
+const mainCtaEl = document.querySelector("#mainCta");
 const playerTemplate = document.querySelector("#playerTemplate");
 
 document.querySelector("#autoSquad").addEventListener("click", selectBestSquad);
 document.querySelector("#resetGame").addEventListener("click", resetGame);
 dailyBonusEl.addEventListener("click", claimDailyBonus);
+mainCtaEl.addEventListener("click", handleMainCta);
+screenButtons.forEach((button) => {
+  button.addEventListener("click", () => setActiveScreen(button.dataset.target));
+});
+
+
+function setActiveScreen(screenName) {
+  activeScreen = screenName;
+  screens.forEach((screen) => {
+    screen.classList.toggle("active", screen.dataset.screen === screenName);
+  });
+  screenButtons.forEach((button) => {
+    const isActive = button.dataset.target === screenName;
+    button.classList.toggle("active", isActive);
+    if (isActive) {
+      button.setAttribute("aria-current", "page");
+    } else {
+      button.removeAttribute("aria-current");
+    }
+  });
+}
+
+function firstAvailableTournament() {
+  const currentPower = effectiveSquadPower();
+  return tournaments.find((tournament) => fullSquad() && currentPower >= tournament.required);
+}
+
+function recommendedAction() {
+  if (state.match) {
+    return { label: "Продолжить матч", screen: "home" };
+  }
+
+  if (squadPlayers().length < 4) {
+    return { label: "Открыть ящик", screen: "boxes" };
+  }
+
+  if (firstAvailableTournament()) {
+    return { label: "Играть турнир", screen: "tournaments" };
+  }
+
+  return { label: "Усилить состав", screen: "boxes" };
+}
+
+function handleMainCta() {
+  const action = recommendedAction();
+  setActiveScreen(action.screen);
+}
 
 function ratingClass(rating) {
   if (rating >= 92) return "legend";
@@ -392,6 +445,7 @@ function startTournament(tournament) {
     finished: false,
   };
 
+  activeScreen = "home";
   addLog(`Начался матч: ${tournament.name}.`);
   render();
 }
@@ -522,7 +576,7 @@ function renderBoxes() {
       <strong>${box.name}</strong>
       <p>${box.note}</p>
       <div class="box-meta">
-        <span>⭐ ${box.min}-${box.max}</span>
+        <span>Рейтинг ${box.min}-${box.max}</span>
         <span class="price">🪙 ${box.price}</span>
       </div>
     `;
@@ -552,8 +606,8 @@ function renderSquad() {
   const basePower = squadPower();
   const bonus = squadBalanceBonus();
   squadPowerEl.textContent = basePower;
-  balanceBonusEl.textContent = `Баланс состава: ${bonus > 0 ? "+" : ""}${bonus}`;
-  effectivePowerEl.textContent = `Итоговая сила: ${basePower + bonus}`;
+  balanceBonusEl.textContent = `${bonus > 0 ? "+" : ""}${bonus}`;
+  effectivePowerEl.textContent = basePower + bonus;
 }
 
 function renderCollection() {
@@ -598,12 +652,12 @@ function renderTournaments() {
         <strong>${tournament.name}</strong>
         <span class="trophy-mark" aria-label="Трофей">🏆</span>
       </div>
-      <p>Собери силу, проверь статус и запускай матч, когда карточка станет доступна.</p>
+      <p>Короткий матч с решениями.</p>
       <div class="tournament-hints">
-        <span><small>Нужно силы</small><strong>${tournament.required}</strong></span>
-        <span><small>Моя итоговая сила</small><strong>${currentPower}</strong></span>
+        <span><small>Нужно</small><strong>${tournament.required}</strong></span>
+        <span><small>Сейчас</small><strong>${currentPower}</strong></span>
         <span><small>Награда</small><strong>${tournament.reward} 🪙 · ${tournament.rp} RP</strong></span>
-        <span><small>Кубок</small><strong>${tournament.trophy}</strong></span>
+        <span><small>Трофей</small><strong>${tournament.trophy}</strong></span>
         <span class="availability ${statusClass}">${availabilityText}</span>
       </div>
     `;
@@ -620,7 +674,7 @@ function renderTournaments() {
 function renderDailyBonus() {
   const claimed = state.lastDailyBonusDate === todayKey();
   dailyBonusEl.disabled = claimed;
-  dailyBonusEl.textContent = claimed ? "✅ Бонус получен" : "🎁 Бонус +3";
+  dailyBonusEl.textContent = claimed ? "✅ Получен" : "🎁 Бонус +3";
 }
 
 function renderEconomyHint() {
@@ -630,14 +684,13 @@ function renderEconomyHint() {
 function renderLastOpening() {
   const player = state.lastOpenedPlayer;
   if (!player) {
+    latestSectionEl.hidden = true;
+    lastOpeningEl.replaceChildren();
     lastOpeningEl.className = "last-opening";
-    lastOpeningEl.innerHTML = `
-      <span class="last-opening__label">Последнее открытие</span>
-      <strong>Пока нет открытий</strong>
-      <small>Открой ящик, чтобы увидеть нового игрока.</small>
-    `;
     return;
   }
+
+  latestSectionEl.hidden = false;
 
   const rarity = rarityName(player.rating);
   lastOpeningEl.className = `last-opening ${ratingClass(player.rating)}`;
@@ -648,7 +701,7 @@ function renderLastOpening() {
   meta.innerHTML = `
     <span class="last-opening__label">Последнее открытие</span>
     <strong>${player.rating} · ${player.name}</strong>
-    <small>${positionIcon(player.position)} ${player.position} · ${rarity} · ${player.source}</small>
+    <small>${positionIcon(player.position)} ${player.position} · ${rarity}</small>
   `;
   const wrapper = document.createElement("div");
   wrapper.className = "last-opening-card";
@@ -662,7 +715,7 @@ function renderTrophies() {
   if (trophyNames.length === 0) {
     const empty = document.createElement("p");
     empty.className = "muted";
-    empty.textContent = "Трофеев пока нет. Победи в турнире, чтобы открыть коллекцию кубков.";
+    empty.textContent = "Трофеев пока нет.";
     trophiesEl.append(empty);
     return;
   }
@@ -670,13 +723,14 @@ function renderTrophies() {
   trophyNames.sort().forEach((name) => {
     const item = document.createElement("div");
     item.className = "trophy-item";
-    item.innerHTML = `<strong>${name}</strong><span>Побед: ${state.trophies[name]}</span>`;
+    item.innerHTML = `<strong>${name}</strong><span>×${state.trophies[name]}</span>`;
     trophiesEl.append(item);
   });
 }
 
 function renderMatch() {
   decisionButtonsEl.replaceChildren();
+  matchPanelEl.classList.toggle("is-live", Boolean(state.match));
 
   if (!state.match) {
     matchHintEl.textContent = "Выбери турнир, потом принимай решения в ключевых моментах игры.";
@@ -722,11 +776,16 @@ function renderMatch() {
 
 function renderLog() {
   logEl.replaceChildren();
-  state.log.forEach((item) => {
+  state.log.slice(0, 3).forEach((item) => {
     const li = document.createElement("li");
     li.textContent = item;
     logEl.append(li);
   });
+}
+
+function renderMainCta() {
+  const action = recommendedAction();
+  mainCtaEl.textContent = action.label;
 }
 
 function render() {
@@ -742,6 +801,8 @@ function render() {
   renderTrophies();
   renderMatch();
   renderLog();
+  renderMainCta();
+  setActiveScreen(activeScreen);
   saveGame();
 }
 
