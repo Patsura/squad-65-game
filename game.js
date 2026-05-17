@@ -91,6 +91,8 @@ const state = {
   economyHint: "Сначала собери 4 игроков, потом усиливай состав.",
   lastOpenedPlayer: null,
   match: null,
+  highlightPlayerId: null,
+  dailyBonusPulse: false,
 };
 
 const coinEl = document.querySelector("#coins");
@@ -122,6 +124,10 @@ const latestSectionEl = document.querySelector("#latestSection");
 const matchPanelEl = document.querySelector("#matchPanel");
 const mainCtaEl = document.querySelector("#mainCta");
 const playerTemplate = document.querySelector("#playerTemplate");
+const packOpeningEl = document.querySelector("#packOpening");
+const packRevealStageEl = document.querySelector("#packRevealStage");
+const closePackOpeningEl = document.querySelector("#closePackOpening");
+const claimPackPlayerEl = document.querySelector("#claimPackPlayer");
 
 document.querySelector("#autoSquad").addEventListener("click", selectBestSquad);
 document.querySelector("#resetGame").addEventListener("click", resetGame);
@@ -129,6 +135,16 @@ dailyBonusEl.addEventListener("click", claimDailyBonus);
 mainCtaEl.addEventListener("click", handleMainCta);
 screenButtons.forEach((button) => {
   button.addEventListener("click", () => setActiveScreen(button.dataset.target));
+});
+closePackOpeningEl.addEventListener("click", closePackOpening);
+claimPackPlayerEl.addEventListener("click", closePackOpening);
+packOpeningEl.addEventListener("click", (event) => {
+  if (event.target === packOpeningEl) closePackOpening();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && packOpeningEl.classList.contains("active")) {
+    closePackOpening();
+  }
 });
 
 
@@ -199,6 +215,53 @@ function makeId() {
   return `player-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+
+const skinTones = ["#f1c59f", "#d79a69", "#b97852", "#8f553e", "#f5d4b5"];
+const hairColors = ["#1e2430", "#51321f", "#8a5a31", "#d7b16a", "#27384b"];
+const kitAccents = ["stripe", "chevron", "halo", "slash"];
+
+function hashString(value) {
+  return String(value).split("").reduce((hash, char) => ((hash << 5) - hash + char.charCodeAt(0)) | 0, 0);
+}
+
+function seededPick(seed, list, offset = 0) {
+  return Math.abs(seed + offset) % list.length;
+}
+
+function ensurePlayerIdentity(player) {
+  const seedSource = player.portraitSeed || `${player.id || player.name}-${player.rating}-${player.position}`;
+  const seed = hashString(seedSource);
+  return {
+    ...player,
+    portraitSeed: player.portraitSeed || `p-${Math.abs(seed)}`,
+    faceType: player.faceType || `face-${seededPick(seed, [0, 1, 2], 3) + 1}`,
+    hairType: player.hairType || `hair-${seededPick(seed, [0, 1, 2, 3], 7) + 1}`,
+    skinTone: player.skinTone || skinTones[seededPick(seed, skinTones, 11)],
+    hairColor: player.hairColor || hairColors[seededPick(seed, hairColors, 17)],
+    accentStyle: player.accentStyle || kitAccents[seededPick(seed, kitAccents, 23)],
+  };
+}
+
+function createPortrait(player) {
+  const portrait = document.createElement("span");
+  portrait.className = `portrait ${player.faceType} ${player.hairType} ${player.accentStyle}`;
+  portrait.style.setProperty("--skin", player.skinTone);
+  portrait.style.setProperty("--hair", player.hairColor);
+  portrait.innerHTML = `
+    <span class="portrait-glow"></span>
+    <span class="portrait-kit"><span></span></span>
+    <span class="portrait-neck"></span>
+    <span class="portrait-head">
+      <span class="portrait-hair"></span>
+      <span class="portrait-eyes"></span>
+      <span class="portrait-mouth"></span>
+      <span class="portrait-shine"></span>
+    </span>
+    <span class="portrait-badge">${positionIcon(player.position)}</span>
+  `;
+  return portrait;
+}
+
 function getRank() {
   let index = 0;
   ranks.forEach((rank, rankIndex) => {
@@ -219,13 +282,14 @@ function addRankPoints(amount) {
 function createPlayer(box) {
   const rating = randomInt(box.min, box.max);
   const name = `${firstNames[randomInt(0, firstNames.length - 1)]} ${lastNames[randomInt(0, lastNames.length - 1)]}`;
-  return {
+  const player = {
     id: makeId(),
     name,
     rating,
     position: positions[randomInt(0, positions.length - 1)],
     source: box.name,
   };
+  return ensurePlayerIdentity(player);
 }
 
 function squadPlayers() {
@@ -291,7 +355,10 @@ function loadGame() {
     state.coins = Number.isFinite(data.coins) ? data.coins : 12;
     state.rankPoints = Number.isFinite(data.rankPoints) ? data.rankPoints : 0;
     state.players = Array.isArray(data.players)
-      ? data.players.map((player) => ({ ...player, position: player.position || positions[randomInt(0, positions.length - 1)] }))
+      ? data.players.map((player) => ensurePlayerIdentity({
+          ...player,
+          position: player.position || positions[randomInt(0, positions.length - 1)],
+        }))
       : [];
     state.squad = normalizeSquad(data.squad);
     state.trophies = data.trophies && typeof data.trophies === "object" ? data.trophies : {};
@@ -318,6 +385,7 @@ function claimDailyBonus() {
 
   state.coins += 3;
   state.lastDailyBonusDate = todayKey();
+  state.dailyBonusPulse = true;
   addLog("Ежедневный бонус получен: +3 монеты.");
   render();
 }
@@ -344,6 +412,7 @@ function openBox(box) {
   const player = createPlayer(box);
   state.players.push(player);
   state.lastOpenedPlayer = player;
+  state.highlightPlayerId = player.id;
   addLog(`Из "${box.name}" выпал ${player.name} с рейтингом ${player.rating}.`);
 
   const emptySlot = state.squad.findIndex((id) => id === null);
@@ -353,6 +422,50 @@ function openBox(box) {
   }
 
   render();
+  showPackOpening(box, player);
+}
+
+
+function closePackOpening() {
+  packOpeningEl.classList.remove("active");
+  packOpeningEl.setAttribute("aria-hidden", "true");
+  packRevealStageEl.replaceChildren();
+  state.highlightPlayerId = null;
+  render();
+}
+
+function createPackBack(box) {
+  const pack = document.createElement("div");
+  pack.className = `pack-back ${box.id}`;
+  pack.innerHTML = `
+    <span class="pack-back__shine"></span>
+    <span class="pack-back__mark">65</span>
+    <strong>${box.name}</strong>
+    <small>Рейтинг ${box.min}-${box.max}</small>
+  `;
+  return pack;
+}
+
+function showPackOpening(box, player) {
+  packRevealStageEl.replaceChildren();
+  const stage = document.createElement("div");
+  stage.className = `pack-reveal ${ratingClass(player.rating)}`;
+  const pack = createPackBack(box);
+  const revealedCard = playerCard(player);
+  revealedCard.classList.add("revealed-card");
+  revealedCard.tabIndex = -1;
+  const summary = document.createElement("div");
+  summary.className = "pack-result-copy";
+  summary.innerHTML = `
+    <span>${rarityName(player.rating)} · ${positionIcon(player.position)} ${player.position}</span>
+    <strong>${player.rating} ${player.name}</strong>
+    <small>Игрок уже добавлен в коллекцию. Нажми “Забрать игрока”, чтобы закрыть показ.</small>
+  `;
+  stage.append(pack, revealedCard, summary);
+  packRevealStageEl.append(stage);
+  packOpeningEl.classList.add("active");
+  packOpeningEl.setAttribute("aria-hidden", "false");
+  claimPackPlayerEl.focus({ preventScroll: true });
 }
 
 function selectPlayer(playerId) {
@@ -537,6 +650,10 @@ function positionIcon(position) {
   return { ВР: "🧤", ЗЩ: "🛡️", ПЗ: "⚙️", НП: "⚡" }[position] || "●";
 }
 
+function positionLabel(position) {
+  return { ВР: "вратарь", ЗЩ: "защитник", ПЗ: "полузащитник", НП: "нападающий" }[position] || "игрок";
+}
+
 function playerCard(player) {
   const node = playerTemplate.content.firstElementChild.cloneNode(true);
   node.classList.add(ratingClass(player.rating));
@@ -544,12 +661,15 @@ function playerCard(player) {
   node.querySelector(".rating").textContent = player.rating;
   node.querySelector(".name").textContent = player.name;
   node.querySelector(".position").textContent = `${positionIcon(player.position)} ${player.position}`;
-  node.querySelector(".avatar-icon").textContent = positionIcon(player.position);
-  node.querySelector(".rarity").textContent = rarityName(player.rating);
+  node.querySelector(".avatar").append(createPortrait(ensurePlayerIdentity(player)));
+  node.querySelector(".rarity").textContent = `${rarityName(player.rating)} · ${positionLabel(player.position)}`;
   node.querySelector(".source").textContent = player.source;
   node.addEventListener("click", () => selectPlayer(player.id));
   if (state.squad.includes(player.id)) {
     node.classList.add("in-squad");
+  }
+  if (state.highlightPlayerId === player.id) {
+    node.classList.add("just-added");
   }
   return node;
 }
@@ -573,11 +693,17 @@ function renderBoxes() {
     const article = document.createElement("article");
     article.className = `box-card ${box.id}`;
     article.innerHTML = `
-      <strong>${box.name}</strong>
-      <p>${box.note}</p>
-      <div class="box-meta">
-        <span>Рейтинг ${box.min}-${box.max}</span>
-        <span class="price">🪙 ${box.price}</span>
+      <div class="box-visual" aria-hidden="true">
+        <span class="box-visual__card">65</span>
+        <span class="box-visual__glow"></span>
+      </div>
+      <div class="box-copy">
+        <strong>${box.name}</strong>
+        <p>${box.note}</p>
+        <div class="box-meta">
+          <span>Рейтинг ${box.min}-${box.max}</span>
+          <span class="price">🪙 ${box.price}</span>
+        </div>
       </div>
     `;
     const button = document.createElement("button");
@@ -675,6 +801,13 @@ function renderDailyBonus() {
   const claimed = state.lastDailyBonusDate === todayKey();
   dailyBonusEl.disabled = claimed;
   dailyBonusEl.textContent = claimed ? "✅ Получен" : "🎁 Бонус +3";
+  dailyBonusEl.classList.toggle("bonus-pulse", state.dailyBonusPulse);
+  if (state.dailyBonusPulse) {
+    window.setTimeout(() => {
+      state.dailyBonusPulse = false;
+      dailyBonusEl.classList.remove("bonus-pulse");
+    }, 900);
+  }
 }
 
 function renderEconomyHint() {
@@ -768,7 +901,13 @@ function renderMatch() {
   moment.options.forEach((option) => {
     const button = document.createElement("button");
     button.type = "button";
-    button.innerHTML = `<strong>${option.label}</strong><span>Энергия ${option.energy > 0 ? "+" : ""}${option.energy}, риск ${option.risk}</span>`;
+    button.innerHTML = `
+      <strong>${option.label}</strong>
+      <span class="decision-badges">
+        <em>⚡ ${option.energy > 0 ? "+" : ""}${option.energy}</em>
+        <em>🎲 риск ${option.risk}</em>
+      </span>
+    `;
     button.addEventListener("click", () => chooseDecision(option));
     decisionButtonsEl.append(button);
   });

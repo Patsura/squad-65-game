@@ -161,7 +161,7 @@
           <span class="rating"></span>
           <span class="position"></span>
         </span>
-        <span class="avatar" aria-hidden="true"><span class="avatar-icon"></span></span>
+        <span class="avatar" aria-hidden="true"></span>
         <span class="card-info">
           <span class="name"></span>
           <span class="rarity"></span>
@@ -169,6 +169,16 @@
         </span>
       </button>
     </template>
+
+    <div id="packOpening" class="pack-opening" aria-hidden="true">
+      <div class="pack-opening__panel" role="dialog" aria-modal="true" aria-labelledby="packOpeningTitle">
+        <button id="closePackOpening" class="pack-opening__close" type="button" aria-label="Закрыть открытие">×</button>
+        <p class="kicker">новая карта</p>
+        <h2 id="packOpeningTitle">Открытие ящика</h2>
+        <div id="packRevealStage" class="pack-reveal-stage"></div>
+        <button id="claimPackPlayer" class="pack-opening__claim" type="button">Забрать игрока</button>
+      </div>
+    </div>
 
     <script src="game.js"></script>
   </body>
