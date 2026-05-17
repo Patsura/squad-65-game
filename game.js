@@ -459,7 +459,7 @@ function showPackOpening(box, player) {
   summary.innerHTML = `
     <span>${rarityName(player.rating)} · ${positionIcon(player.position)} ${player.position}</span>
     <strong>${player.rating} ${player.name}</strong>
-    <small>Герой уже добавлен в архив. Нажми “Забрать героя”, чтобы закрыть показ.</small>
+    <small>Игрок уже добавлен в архив. Нажми “Забрать”, чтобы закрыть показ.</small>
   `;
   stage.append(pack, revealedCard, summary);
   packRevealStageEl.append(stage);
@@ -651,18 +651,26 @@ function positionIcon(position) {
 }
 
 function positionLabel(position) {
-  return { ВР: "страж", ЗЩ: "защитник", ПЗ: "тактик", НП: "авангард" }[position] || "герой";
+  return { ВР: "вратарь", ЗЩ: "защитник", ПЗ: "полузащитник", НП: "нападающий" }[position] || "игрок";
 }
 
-function playerCard(player) {
+function shortPlayerName(name) {
+  const parts = String(name).trim().split(/\s+/).filter(Boolean);
+  if (parts.length <= 1) return parts[0] || "Игрок";
+  return `${parts[0][0]}. ${parts[parts.length - 1]}`;
+}
+
+function playerCard(player, options = {}) {
   const node = playerTemplate.content.firstElementChild.cloneNode(true);
+  const compact = Boolean(options.compact);
   node.classList.add(ratingClass(player.rating));
+  node.classList.toggle("compact-card", compact);
   node.dataset.position = player.position;
   node.querySelector(".rating").textContent = player.rating;
-  node.querySelector(".name").textContent = player.name;
+  node.querySelector(".name").textContent = compact ? shortPlayerName(player.name) : player.name;
   node.querySelector(".position").textContent = `${positionIcon(player.position)} ${player.position}`;
   node.querySelector(".avatar").append(createPortrait(ensurePlayerIdentity(player)));
-  node.querySelector(".rarity").textContent = `${rarityName(player.rating)} · ${positionLabel(player.position)}`;
+  node.querySelector(".rarity").textContent = compact ? rarityName(player.rating) : `${rarityName(player.rating)} · ${positionLabel(player.position)}`;
   node.querySelector(".source").textContent = player.source;
   node.addEventListener("click", () => selectPlayer(player.id));
   if (state.squad.includes(player.id)) {
@@ -721,7 +729,7 @@ function renderSquad() {
     slot.replaceChildren();
     const player = state.players.find((item) => item.id === state.squad[index]);
     if (player) {
-      slot.append(playerCard(player));
+      slot.append(playerCard(player, { compact: true }));
     } else {
       const placeholder = document.createElement("span");
       placeholder.className = "slot-placeholder";
